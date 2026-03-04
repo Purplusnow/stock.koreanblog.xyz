@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>K-Stock Dashboard v1.1.0</title>
+  <title>K-Stock Dashboard v1.1.1</title>
   <meta name="description" content="국내 주식(코스피/코스닥) 대시보드 MVP: 네이버 실시간 시세 기반 지수, 거래량 TOP10, 상승률 TOP10, 기본 30종목." />
 
   <!-- AdSense -->
@@ -178,14 +178,12 @@
       margin-bottom:8px;
     }
 
+    /* ✅ TOP10 상하 배치 */
     .twoCards{
       display:grid;
-      grid-template-columns:1fr 1fr;
+      grid-template-columns:1fr; /* 2열 -> 1열 */
       gap:16px;
       margin-top:0;
-    }
-    @media (max-width: 980px){
-      .twoCards{grid-template-columns:1fr}
     }
 
     table{
@@ -197,20 +195,46 @@
       padding:11px 10px;
       border-bottom:1px solid var(--stroke);
       font-size:13px;
+      vertical-align:middle;
     }
     th{
       text-align:left;
       color:var(--muted2);
       font-weight:750;
       background:rgba(255,255,255,.03);
+      white-space:nowrap;
     }
     td{color:#eaf2ffdd}
-    .right{text-align:right}
+    .right{text-align:right; white-space:nowrap}
     .sym{
       color:var(--muted2);
       font-size:12px;
       margin-left:8px;
       font-weight:650;
+      white-space:nowrap;
+    }
+
+    /* ✅ 종목명 줄바꿈/행높이 들쭉날쭉 방지: 한 줄 + 말줄임 */
+    .nameCell{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      min-width:0;
+    }
+    .nameCell .nm{
+      flex:1;
+      min-width:0;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+    }
+    .nameCell .sy{
+      flex:0 0 auto;
+      color:var(--muted2);
+      font-size:12px;
+      font-weight:700;
+      letter-spacing:.2px;
+      white-space:nowrap;
     }
 
     .foot{
@@ -229,7 +253,7 @@
         <div class="logo"></div>
         <div class="title">
           <b>K-Stock Dashboard</b>
-          <span>v1.1.0 · 네이버 시세 기반</span>
+          <span>v1.1.1 · 네이버 시세 기반</span>
         </div>
       </div>
 
@@ -295,6 +319,7 @@
           </div>
         </section>
 
+        <!-- ✅ TOP10 상하 배치 -->
         <div class="twoCards">
           <section class="card">
             <div class="hd">
@@ -489,6 +514,16 @@
         .replaceAll("'","&#039;");
     }
 
+    // ✅ 종목/심볼을 한 줄로 (줄바꿈 방지)
+    function nameCellHtml(name, symbol){
+      return `
+        <div class="nameCell">
+          <span class="nm">${escapeHtml(name || "-")}</span>
+          <span class="sy">${escapeHtml(symbol)}</span>
+        </div>
+      `;
+    }
+
     function rowHtmlCommon(name, symbol, price, pct, vol, chg){
       const cls = classBySign(pct);
       const cls2 = classBySign(chg);
@@ -496,10 +531,7 @@
       const signPct = (pct > 0) ? "+" : "";
       return `
         <tr>
-          <td>
-            ${escapeHtml(name || "-")}
-            <span class="sym">${escapeHtml(symbol)}</span>
-          </td>
+          <td>${nameCellHtml(name, symbol)}</td>
           <td class="right">${fmtPrice(price)}</td>
           <td class="right ${cls2}">${sign}${fmtPrice(chg)}</td>
           <td class="right ${cls}">${signPct}${fmtPct(pct)}</td>
@@ -532,7 +564,7 @@
       $("volTbody").innerHTML = topVol.length
         ? topVol.map(it => `
             <tr>
-              <td>${escapeHtml(it.shortName || it.longName || it.symbol)} <span class="sym">${escapeHtml(it.symbol)}</span></td>
+              <td>${nameCellHtml(it.shortName || it.longName || it.symbol, it.symbol)}</td>
               <td class="right">${fmtPrice(it.regularMarketPrice)}</td>
               <td class="right ${classBySign(it.regularMarketChangePercent)}">${(it.regularMarketChangePercent>0?"+":"")}${fmtPct(it.regularMarketChangePercent)}</td>
               <td class="right">${fmtNum(it.regularMarketVolume)}</td>
@@ -548,7 +580,7 @@
       $("chgTbody").innerHTML = topUp.length
         ? topUp.map(it => `
             <tr>
-              <td>${escapeHtml(it.shortName || it.longName || it.symbol)} <span class="sym">${escapeHtml(it.symbol)}</span></td>
+              <td>${nameCellHtml(it.shortName || it.longName || it.symbol, it.symbol)}</td>
               <td class="right">${fmtPrice(it.regularMarketPrice)}</td>
               <td class="right ${classBySign(it.regularMarketChange)}">${(it.regularMarketChange>0?"+":"")}${fmtPrice(it.regularMarketChange)}</td>
               <td class="right ${classBySign(it.regularMarketChangePercent)}">${(it.regularMarketChangePercent>0?"+":"")}${fmtPct(it.regularMarketChangePercent)}</td>
