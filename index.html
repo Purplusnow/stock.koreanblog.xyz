@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>K-Stock Dashboard v1.0.5</title>
-  <meta name="description" content="국내 주식(코스피/코스닥) 대시보드 MVP: 지수, 거래량 TOP10, 상승률 TOP10, 기본 30종목." />
+  <title>K-Stock Dashboard v1.1.0</title>
+  <meta name="description" content="국내 주식(코스피/코스닥) 대시보드 MVP: 네이버 실시간 시세 기반 지수, 거래량 TOP10, 상승률 TOP10, 기본 30종목." />
 
   <!-- AdSense -->
   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4640178123605595"
@@ -24,7 +24,6 @@
       --good:#2ecc71;
       --bad:#ff4d4f;
       --warn:#ffcc00;
-      --blue:#4aa3ff;
       --shadow: 0 18px 50px rgba(0,0,0,.45);
       --r:22px;
     }
@@ -45,22 +44,16 @@
       display:flex; align-items:center; justify-content:space-between; gap:14px;
       margin-bottom:18px;
     }
-    .brand{
-      display:flex; align-items:center; gap:12px; min-width:240px;
-    }
+    .brand{display:flex; align-items:center; gap:12px; min-width:240px}
     .logo{
       width:40px; height:40px; border-radius:12px;
       background:linear-gradient(135deg,#4aa3ff,#42e6b8);
       box-shadow:0 10px 30px rgba(0,0,0,.35);
     }
-    .title{
-      display:flex; flex-direction:column; line-height:1.1;
-    }
+    .title{display:flex; flex-direction:column; line-height:1.1}
     .title b{font-size:28px; letter-spacing:.2px}
     .title span{color:var(--muted2); font-size:13px; margin-top:4px}
-    .actions{
-      display:flex; align-items:center; gap:10px; flex-wrap:wrap; justify-content:flex-end;
-    }
+    .actions{display:flex; align-items:center; gap:10px; flex-wrap:wrap; justify-content:flex-end}
     .pill{
       display:inline-flex; align-items:center; gap:8px;
       padding:9px 12px; border-radius:999px;
@@ -102,6 +95,12 @@
     @media (max-width: 980px){
       .grid{grid-template-columns:1fr}
     }
+    .leftCol{
+      display:flex;
+      flex-direction:column;
+      gap:16px;
+      min-width:0;
+    }
 
     .card{
       border-radius:var(--r);
@@ -109,18 +108,16 @@
       border:1px solid var(--stroke);
       box-shadow:var(--shadow);
       overflow:hidden;
+      min-width:0;
     }
     .card .hd{
       padding:18px 18px 14px;
       display:flex; align-items:flex-end; justify-content:space-between; gap:10px;
     }
-    .card .hd h2{
-      margin:0; font-size:24px; letter-spacing:.2px;
-    }
-    .card .hd .sub{
-      color:var(--muted2); font-size:13px; text-align:right;
-    }
+    .card .hd h2{margin:0; font-size:24px; letter-spacing:.2px}
+    .card .hd .sub{color:var(--muted2); font-size:13px; text-align:right}
     .card .bd{padding:0 18px 18px}
+
     .indexRow{
       display:grid;
       grid-template-columns:1fr 1fr;
@@ -130,6 +127,7 @@
     @media (max-width: 520px){
       .indexRow{grid-template-columns:1fr}
     }
+
     .ibox{
       border-radius:18px;
       border:1px solid var(--stroke);
@@ -144,9 +142,7 @@
       margin-top:10px;
       display:flex; align-items:flex-end; justify-content:space-between; gap:10px;
     }
-    .ibox .price{
-      font-size:22px; font-weight:800;
-    }
+    .ibox .price{font-size:22px; font-weight:800}
     .ibox .chg{
       font-size:13px; font-weight:750;
       padding:6px 10px; border-radius:999px;
@@ -154,6 +150,7 @@
       background:#0a1220;
       white-space:nowrap;
     }
+
     .good{color:var(--good)}
     .bad{color:var(--bad)}
     .muted{color:var(--muted2)}
@@ -185,7 +182,7 @@
       display:grid;
       grid-template-columns:1fr 1fr;
       gap:16px;
-      margin-top:16px;
+      margin-top:0;
     }
     @media (max-width: 980px){
       .twoCards{grid-template-columns:1fr}
@@ -232,7 +229,7 @@
         <div class="logo"></div>
         <div class="title">
           <b>K-Stock Dashboard</b>
-          <span>v1.0.5 · 국내주식 MVP</span>
+          <span>v1.1.0 · 네이버 시세 기반</span>
         </div>
       </div>
 
@@ -247,55 +244,103 @@
     </div>
 
     <div class="grid">
-      <section class="card">
-        <div class="hd">
-          <h2>오늘 시장</h2>
-          <div class="sub">
-            <div>업데이트: <span id="lastUpdated">-</span></div>
-          </div>
-        </div>
-
-        <div class="bd">
-          <div class="indexRow">
-            <div class="ibox">
-              <div class="name">
-                <span>코스피</span>
-                <span class="muted">^KS11</span>
-              </div>
-              <div class="val">
-                <div class="price" id="kospiPrice">-</div>
-                <div class="chg" id="kospiChg">-</div>
-              </div>
-            </div>
-
-            <div class="ibox">
-              <div class="name">
-                <span>코스닥</span>
-                <span class="muted">^KQ11</span>
-              </div>
-              <div class="val">
-                <div class="price" id="kosdaqPrice">-</div>
-                <div class="chg" id="kosdaqChg">-</div>
-              </div>
+      <div class="leftCol">
+        <section class="card">
+          <div class="hd">
+            <h2>오늘 시장</h2>
+            <div class="sub">
+              <div>업데이트: <span id="lastUpdated">-</span></div>
             </div>
           </div>
 
-          <div class="note">
-            안내: 거래량 TOP10과 상승률 TOP10은 기본 30개 종목 범위에서 계산됩니다.
-          </div>
+          <div class="bd">
+            <div class="indexRow">
+              <div class="ibox">
+                <div class="name">
+                  <span>코스피</span>
+                  <span class="muted">^KS11</span>
+                </div>
+                <div class="val">
+                  <div class="price" id="kospiPrice">-</div>
+                  <div class="chg" id="kospiChg">-</div>
+                </div>
+              </div>
 
-          <div class="adsBox">
-            <div class="label">광고</div>
+              <div class="ibox">
+                <div class="name">
+                  <span>코스닥</span>
+                  <span class="muted">^KQ11</span>
+                </div>
+                <div class="val">
+                  <div class="price" id="kosdaqPrice">-</div>
+                  <div class="chg" id="kosdaqChg">-</div>
+                </div>
+              </div>
+            </div>
 
-            <ins class="adsbygoogle"
-                 style="display:block"
-                 data-ad-client="ca-pub-4640178123605595"
-                 data-ad-slot="1089514795"
-                 data-ad-format="auto"
-                 data-full-width-responsive="true"></ins>
+            <div class="note">
+              안내: 거래량 TOP10과 상승률 TOP10은 기본 30개 종목 범위에서 계산됩니다.
+            </div>
+
+            <div class="adsBox">
+              <div class="label">광고</div>
+
+              <ins class="adsbygoogle"
+                   style="display:block"
+                   data-ad-client="ca-pub-4640178123605595"
+                   data-ad-slot="1089514795"
+                   data-ad-format="auto"
+                   data-full-width-responsive="true"></ins>
+            </div>
           </div>
+        </section>
+
+        <div class="twoCards">
+          <section class="card">
+            <div class="hd">
+              <h2>거래량 TOP10</h2>
+              <div class="sub">기본 30종목 범위</div>
+            </div>
+            <div class="bd">
+              <table>
+                <thead>
+                  <tr>
+                    <th>종목</th>
+                    <th class="right">가격</th>
+                    <th class="right">등락률</th>
+                    <th class="right">거래량</th>
+                  </tr>
+                </thead>
+                <tbody id="volTbody">
+                  <tr><td colspan="4" class="muted">데이터를 불러오는 중…</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </section>
+
+          <section class="card">
+            <div class="hd">
+              <h2>상승률 TOP10</h2>
+              <div class="sub">기본 30종목 범위</div>
+            </div>
+            <div class="bd">
+              <table>
+                <thead>
+                  <tr>
+                    <th>종목</th>
+                    <th class="right">가격</th>
+                    <th class="right">등락</th>
+                    <th class="right">등락률</th>
+                  </tr>
+                </thead>
+                <tbody id="chgTbody">
+                  <tr><td colspan="4" class="muted">데이터를 불러오는 중…</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </section>
         </div>
-      </section>
+      </div>
 
       <section class="card">
         <div class="hd">
@@ -322,62 +367,16 @@
       </section>
     </div>
 
-    <div class="twoCards">
-      <section class="card">
-        <div class="hd">
-          <h2>거래량 TOP10</h2>
-          <div class="sub">기본 30종목 범위</div>
-        </div>
-        <div class="bd">
-          <table>
-            <thead>
-              <tr>
-                <th>종목</th>
-                <th class="right">가격</th>
-                <th class="right">등락률</th>
-                <th class="right">거래량</th>
-              </tr>
-            </thead>
-            <tbody id="volTbody">
-              <tr><td colspan="4" class="muted">데이터를 불러오는 중…</td></tr>
-            </tbody>
-          </table>
-        </div>
-      </section>
-
-      <section class="card">
-        <div class="hd">
-          <h2>상승률 TOP10</h2>
-          <div class="sub">기본 30종목 범위</div>
-        </div>
-        <div class="bd">
-          <table>
-            <thead>
-              <tr>
-                <th>종목</th>
-                <th class="right">가격</th>
-                <th class="right">등락</th>
-                <th class="right">등락률</th>
-              </tr>
-            </thead>
-            <tbody id="chgTbody">
-              <tr><td colspan="4" class="muted">데이터를 불러오는 중…</td></tr>
-            </tbody>
-          </table>
-        </div>
-      </section>
-    </div>
-
     <div class="foot">
-      데이터: Yahoo Finance (via Cloudflare Worker) · 표시값은 지연/오차가 있을 수 있습니다.
+      데이터: Naver Finance (via Cloudflare Worker) · 표시값은 지연/오차가 있을 수 있습니다.
     </div>
   </div>
 
   <script>
-    // ===== 설정 =====
-    const WORKER_BASE = "https://billowing-snowflake-fc22.purplusnow.workers.dev";
+    // 설정
+    const WORKER_BASE = "https://YOUR-WORKER.workers.dev";
 
-    // 기본 30개 (원하면 여기서 편집)
+    // 기본 30개 (원하면 여기만 편집)
     const DEFAULT_SYMBOLS = [
       "005930.KS","000660.KS","005380.KS","000270.KS","035420.KS",
       "035720.KS","373220.KS","207940.KS","068270.KS","005490.KS",
@@ -389,7 +388,6 @@
 
     const INDEX_SYMBOLS = ["^KS11","^KQ11"];
 
-    // ===== 유틸 =====
     const $ = (id) => document.getElementById(id);
 
     function setStatus(kind, msg){
@@ -432,16 +430,6 @@
       return "";
     }
 
-    function escapeHtml(s){
-      return String(s ?? "")
-        .replaceAll("&","&amp;")
-        .replaceAll("<","&lt;")
-        .replaceAll(">","&gt;")
-        .replaceAll('"',"&quot;")
-        .replaceAll("'","&#039;");
-    }
-
-    // ===== Worker 호출 =====
     async function fetchQuote(symbols){
       const q = encodeURIComponent(symbols.join(","));
       const url = WORKER_BASE + "/quote?symbols=" + q;
@@ -450,21 +438,19 @@
       const text = await r.text();
 
       if (!r.ok) {
-        throw new Error("Worker HTTP " + r.status + " " + text.slice(0, 200));
+        throw new Error("Worker HTTP " + r.status + " " + text.slice(0, 160));
       }
 
       let json;
       try {
         json = JSON.parse(text);
-      } catch (e) {
-        throw new Error("JSON parse failed: " + text.slice(0, 220));
+      } catch {
+        throw new Error("JSON parse failed: " + text.slice(0, 180));
       }
 
       const result = json?.quoteResponse?.result;
-
       if (!Array.isArray(result)) {
-        const keys = json && typeof json === "object" ? Object.keys(json).slice(0, 12).join(", ") : "not-object";
-        throw new Error("Unexpected response schema. topKeys=" + keys + " sample=" + text.slice(0, 220));
+        throw new Error("Unexpected response schema: " + text.slice(0, 180));
       }
 
       const map = new Map();
@@ -474,7 +460,6 @@
       return map;
     }
 
-    // ===== 렌더 =====
     function renderIndex(item, priceEl, chgEl){
       if (!item) {
         priceEl.textContent = "-";
@@ -493,6 +478,15 @@
       chgEl.className = "chg " + cls;
       const sign = (chg > 0) ? "+" : "";
       chgEl.textContent = sign + fmtPrice(chg) + " (" + sign + fmtPct(pct) + ")";
+    }
+
+    function escapeHtml(s){
+      return String(s ?? "")
+        .replaceAll("&","&amp;")
+        .replaceAll("<","&lt;")
+        .replaceAll(">","&gt;")
+        .replaceAll('"',"&quot;")
+        .replaceAll("'","&#039;");
     }
 
     function rowHtmlCommon(name, symbol, price, pct, vol, chg){
@@ -520,16 +514,14 @@
       if (!items.length) {
         baseTbody.innerHTML = `<tr><td colspan="5" class="muted">표시할 종목이 없습니다.</td></tr>`;
       } else {
-        baseTbody.innerHTML = items.map(it => {
-          return rowHtmlCommon(
-            it.shortName || it.longName || it.symbol,
-            it.symbol,
-            it.regularMarketPrice,
-            it.regularMarketChangePercent,
-            it.regularMarketVolume,
-            it.regularMarketChange
-          );
-        }).join("");
+        baseTbody.innerHTML = items.map(it => rowHtmlCommon(
+          it.shortName || it.longName || it.symbol,
+          it.symbol,
+          it.regularMarketPrice,
+          it.regularMarketChangePercent,
+          it.regularMarketVolume,
+          it.regularMarketChange
+        )).join("");
       }
 
       const topVol = [...items]
@@ -565,7 +557,6 @@
         : `<tr><td colspan="4" class="muted">등락률 데이터가 없습니다.</td></tr>`;
     }
 
-    // ===== 메인 로직 =====
     async function refreshAll(){
       setStatus("warn", "상태: 로딩");
       $("lastUpdated").textContent = "-";
@@ -580,31 +571,25 @@
         const items = DEFAULT_SYMBOLS.map(sym => map.get(sym)).filter(Boolean);
         renderTables(items);
 
-        const now = new Date();
-        $("lastUpdated").textContent = now.toLocaleString("ko-KR");
-
+        $("lastUpdated").textContent = new Date().toLocaleString("ko-KR");
         setStatus("ok", "상태: 정상");
       } catch (e) {
         console.error(e);
         setStatus("error", "상태: 오류");
-
         $("baseTbody").innerHTML = `<tr><td colspan="5" class="muted">데이터를 불러오지 못했습니다. (콘솔 로그 확인)</td></tr>`;
         $("volTbody").innerHTML = `<tr><td colspan="4" class="muted">데이터를 불러오지 못했습니다.</td></tr>`;
         $("chgTbody").innerHTML = `<tr><td colspan="4" class="muted">데이터를 불러오지 못했습니다.</td></tr>`;
       }
     }
 
-    // ===== 이벤트 =====
     $("btnRefresh").addEventListener("click", refreshAll);
 
     $("btnNaver").addEventListener("click", () => {
       window.open("https://finance.naver.com/", "_blank", "noopener,noreferrer");
     });
 
-    // AdSense init
     try { (adsbygoogle = window.adsbygoogle || []).push({}); } catch {}
 
-    // init
     refreshAll();
   </script>
 </body>
