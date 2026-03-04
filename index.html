@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>K-Stock Dashboard v1.1.1</title>
-  <meta name="description" content="국내 주식(코스피/코스닥) 대시보드 MVP: 네이버 실시간 시세 기반 지수, 거래량 TOP10, 상승률 TOP10, 기본 30종목." />
+  <title>K-Stock Dashboard v1.2.0</title>
+  <meta name="description" content="국내 주식(코스피/코스닥) 대시보드: 네이버 실시간 시세 기반 지수 + 전종목(가나다순)." />
 
   <!-- AdSense -->
   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4640178123605595"
@@ -88,18 +88,9 @@
 
     .grid{
       display:grid;
-      grid-template-columns: 1.05fr .95fr;
+      grid-template-columns: 1fr;
       gap:16px;
       align-items:start;
-    }
-    @media (max-width: 980px){
-      .grid{grid-template-columns:1fr}
-    }
-    .leftCol{
-      display:flex;
-      flex-direction:column;
-      gap:16px;
-      min-width:0;
     }
 
     .card{
@@ -127,7 +118,6 @@
     @media (max-width: 520px){
       .indexRow{grid-template-columns:1fr}
     }
-
     .ibox{
       border-radius:18px;
       border:1px solid var(--stroke);
@@ -150,20 +140,9 @@
       background:#0a1220;
       white-space:nowrap;
     }
-
     .good{color:var(--good)}
     .bad{color:var(--bad)}
     .muted{color:var(--muted2)}
-
-    .note{
-      color:var(--muted2);
-      font-size:13px;
-      margin:10px 0 14px;
-      padding:12px 12px;
-      border:1px dashed var(--stroke2);
-      border-radius:16px;
-      background:rgba(0,0,0,.12);
-    }
 
     .adsBox{
       border-radius:18px;
@@ -171,6 +150,7 @@
       padding:12px;
       background:rgba(0,0,0,.12);
       min-height:120px;
+      margin-top:12px;
     }
     .adsBox .label{
       color:var(--muted2);
@@ -178,12 +158,57 @@
       margin-bottom:8px;
     }
 
-    /* ✅ TOP10 상하 배치 */
-    .twoCards{
-      display:grid;
-      grid-template-columns:1fr; /* 2열 -> 1열 */
-      gap:16px;
-      margin-top:0;
+    .toolbar{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      flex-wrap:wrap;
+      margin:6px 0 12px;
+    }
+    .seg{
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+    }
+    .seg button{
+      appearance:none;
+      border:1px solid var(--stroke2);
+      background:rgba(0,0,0,.20);
+      color:#eaf2ffcc;
+      padding:9px 12px;
+      border-radius:999px;
+      cursor:pointer;
+      font-weight:750;
+    }
+    .seg button.active{
+      background:linear-gradient(180deg,#12305a,#0b1f3f);
+      color:#eaf2ff;
+      border-color:#ffffff2a;
+    }
+    .search{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      flex:1;
+      min-width:220px;
+      justify-content:flex-end;
+    }
+    .search input{
+      width:min(520px, 100%);
+      height:44px;
+      padding:0 14px;
+      border-radius:14px;
+      border:1px solid var(--stroke2);
+      background:rgba(0,0,0,.20);
+      color:var(--text);
+      outline:none;
+      font-size:14px;
+    }
+    .miniLine{
+      color:var(--muted2);
+      font-size:13px;
+      margin:6px 0 0;
     }
 
     table{
@@ -203,18 +228,14 @@
       font-weight:750;
       background:rgba(255,255,255,.03);
       white-space:nowrap;
+      position:sticky;
+      top:0;
+      backdrop-filter: blur(10px);
+      z-index:2;
     }
     td{color:#eaf2ffdd}
     .right{text-align:right; white-space:nowrap}
-    .sym{
-      color:var(--muted2);
-      font-size:12px;
-      margin-left:8px;
-      font-weight:650;
-      white-space:nowrap;
-    }
 
-    /* ✅ 종목명 줄바꿈/행높이 들쭉날쭉 방지: 한 줄 + 말줄임 */
     .nameCell{
       display:flex;
       align-items:center;
@@ -227,13 +248,26 @@
       white-space:nowrap;
       overflow:hidden;
       text-overflow:ellipsis;
+      font-weight:750;
     }
     .nameCell .sy{
       flex:0 0 auto;
       color:var(--muted2);
       font-size:12px;
       font-weight:700;
-      letter-spacing:.2px;
+      white-space:nowrap;
+    }
+    .pillMini{
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      padding:6px 10px;
+      border-radius:999px;
+      border:1px solid var(--stroke2);
+      background:rgba(0,0,0,.18);
+      color:#eaf2ffcc;
+      font-size:12px;
+      font-weight:750;
       white-space:nowrap;
     }
 
@@ -253,7 +287,7 @@
         <div class="logo"></div>
         <div class="title">
           <b>K-Stock Dashboard</b>
-          <span>v1.1.1 · 네이버 시세 기반</span>
+          <span>v1.2.0 · 네이버 시세 기반 · 전종목 가나다순</span>
         </div>
       </div>
 
@@ -268,126 +302,90 @@
     </div>
 
     <div class="grid">
-      <div class="leftCol">
-        <section class="card">
-          <div class="hd">
-            <h2>오늘 시장</h2>
-            <div class="sub">
-              <div>업데이트: <span id="lastUpdated">-</span></div>
-            </div>
-          </div>
-
-          <div class="bd">
-            <div class="indexRow">
-              <div class="ibox">
-                <div class="name">
-                  <span>코스피</span>
-                  <span class="muted">^KS11</span>
-                </div>
-                <div class="val">
-                  <div class="price" id="kospiPrice">-</div>
-                  <div class="chg" id="kospiChg">-</div>
-                </div>
-              </div>
-
-              <div class="ibox">
-                <div class="name">
-                  <span>코스닥</span>
-                  <span class="muted">^KQ11</span>
-                </div>
-                <div class="val">
-                  <div class="price" id="kosdaqPrice">-</div>
-                  <div class="chg" id="kosdaqChg">-</div>
-                </div>
-              </div>
-            </div>
-
-            <div class="note">
-              안내: 거래량 TOP10과 상승률 TOP10은 기본 30개 종목 범위에서 계산됩니다.
-            </div>
-
-            <div class="adsBox">
-              <div class="label">광고</div>
-
-              <ins class="adsbygoogle"
-                   style="display:block"
-                   data-ad-client="ca-pub-4640178123605595"
-                   data-ad-slot="1089514795"
-                   data-ad-format="auto"
-                   data-full-width-responsive="true"></ins>
-            </div>
-          </div>
-        </section>
-
-        <!-- ✅ TOP10 상하 배치 -->
-        <div class="twoCards">
-          <section class="card">
-            <div class="hd">
-              <h2>거래량 TOP10</h2>
-              <div class="sub">기본 30종목 범위</div>
-            </div>
-            <div class="bd">
-              <table>
-                <thead>
-                  <tr>
-                    <th>종목</th>
-                    <th class="right">가격</th>
-                    <th class="right">등락률</th>
-                    <th class="right">거래량</th>
-                  </tr>
-                </thead>
-                <tbody id="volTbody">
-                  <tr><td colspan="4" class="muted">데이터를 불러오는 중…</td></tr>
-                </tbody>
-              </table>
-            </div>
-          </section>
-
-          <section class="card">
-            <div class="hd">
-              <h2>상승률 TOP10</h2>
-              <div class="sub">기본 30종목 범위</div>
-            </div>
-            <div class="bd">
-              <table>
-                <thead>
-                  <tr>
-                    <th>종목</th>
-                    <th class="right">가격</th>
-                    <th class="right">등락</th>
-                    <th class="right">등락률</th>
-                  </tr>
-                </thead>
-                <tbody id="chgTbody">
-                  <tr><td colspan="4" class="muted">데이터를 불러오는 중…</td></tr>
-                </tbody>
-              </table>
-            </div>
-          </section>
-        </div>
-      </div>
-
       <section class="card">
         <div class="hd">
-          <h2>기본 30종목</h2>
-          <div class="sub">고정 목록</div>
+          <h2>오늘 시장</h2>
+          <div class="sub">
+            <div>업데이트: <span id="lastUpdated">-</span></div>
+          </div>
         </div>
 
         <div class="bd">
-          <table>
-            <thead>
-              <tr>
-                <th>종목</th>
-                <th class="right">가격</th>
-                <th class="right">등락</th>
-                <th class="right">등락률</th>
-                <th class="right">거래량</th>
-              </tr>
-            </thead>
-            <tbody id="baseTbody">
-              <tr><td colspan="5" class="muted">데이터를 불러오는 중…</td></tr>
-            </tbody>
-          </table>
+          <div class="indexRow">
+            <div class="ibox">
+              <div class="name">
+                <span>코스피</span>
+                <span class="muted">^KS11</span>
+              </div>
+              <div class="val">
+                <div class="price" id="kospiPrice">-</div>
+                <div class="chg" id="kospiChg">-</div>
+              </div>
+            </div>
+
+            <div class="ibox">
+              <div class="name">
+                <span>코스닥</span>
+                <span class="muted">^KQ11</span>
+              </div>
+              <div class="val">
+                <div class="price" id="kosdaqPrice">-</div>
+                <div class="chg" id="kosdaqChg">-</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="adsBox">
+            <div class="label">광고</div>
+            <ins class="adsbygoogle"
+                 style="display:block"
+                 data-ad-client="ca-pub-4640178123605595"
+                 data-ad-slot="1089514795"
+                 data-ad-format="auto"
+                 data-full-width-responsive="true"></ins>
+          </div>
+        </div>
+      </section>
+
+      <section class="card">
+        <div class="hd">
+          <h2>전종목</h2>
+          <div class="sub">
+            <div class="pillMini" id="countPill">-</div>
+          </div>
+        </div>
+
+        <div class="bd">
+          <div class="toolbar">
+            <div class="seg">
+              <button id="btnAll" class="active" data-market="ALL">전체</button>
+              <button id="btnKospi" data-market="KOSPI">코스피</button>
+              <button id="btnKosdaq" data-market="KOSDAQ">코스닥</button>
+            </div>
+
+            <div class="search">
+              <input id="q" placeholder="검색: 종목명 또는 코드(예: 삼성전자 / 005930)" />
+            </div>
+          </div>
+
+          <div class="miniLine" id="hintLine">전종목을 불러오는 중…</div>
+
+          <div style="margin-top:12px; max-height:68vh; overflow:auto; border-radius:16px; border:1px solid var(--stroke);">
+            <table>
+              <thead>
+                <tr>
+                  <th>종목</th>
+                  <th class="right">가격</th>
+                  <th class="right">등락</th>
+                  <th class="right">등락률</th>
+                  <th class="right">거래량</th>
+                </tr>
+              </thead>
+              <tbody id="allTbody">
+                <tr><td colspan="5" class="muted">데이터를 불러오는 중…</td></tr>
+              </tbody>
+            </table>
+          </div>
         </div>
       </section>
     </div>
@@ -398,22 +396,15 @@
   </div>
 
   <script>
-    // 설정
     const WORKER_BASE = "https://billowing-snowflake-fc22.purplusnow.workers.dev";
-
-    // 기본 30개 (원하면 여기만 편집)
-    const DEFAULT_SYMBOLS = [
-      "005930.KS","000660.KS","005380.KS","000270.KS","035420.KS",
-      "035720.KS","373220.KS","207940.KS","068270.KS","005490.KS",
-      "006400.KS","051910.KS","005935.KS","105560.KS","055550.KS",
-      "086790.KS","028260.KS","012450.KS","015760.KS","030200.KS",
-      "066570.KS","003490.KS","323410.KS","259960.KS","000810.KS",
-      "267250.KS","096770.KS","034020.KS","247540.KQ","086520.KQ"
-    ];
-
     const INDEX_SYMBOLS = ["^KS11","^KQ11"];
 
     const $ = (id) => document.getElementById(id);
+
+    let MARKET_FILTER = "ALL";
+    let ALL_LIST = [];   // [{code,name,market}]
+    let QUOTE_MAP = new Map(); // symbol -> quote item
+    let VIEW_ROWS = [];  // 필터+검색 적용된 rows
 
     function setStatus(kind, msg){
       const dot = $("statusDot");
@@ -455,34 +446,78 @@
       return "";
     }
 
-    async function fetchQuote(symbols){
+    function escapeHtml(s){
+      return String(s ?? "")
+        .replaceAll("&","&amp;")
+        .replaceAll("<","&lt;")
+        .replaceAll(">","&gt;")
+        .replaceAll('"',"&quot;")
+        .replaceAll("'","&#039;");
+    }
+
+    function nameCellHtml(name, symbol){
+      return `
+        <div class="nameCell">
+          <span class="nm">${escapeHtml(name || "-")}</span>
+          <span class="sy">${escapeHtml(symbol)}</span>
+        </div>
+      `;
+    }
+
+    async function fetchList(market){
+      const url = WORKER_BASE + "/list?market=" + encodeURIComponent(market);
+      const r = await fetch(url, { cache: "no-store" });
+      const t = await r.text();
+      if (!r.ok) throw new Error("Worker /list HTTP " + r.status + " " + t.slice(0, 160));
+      let j;
+      try { j = JSON.parse(t); } catch { throw new Error("List JSON parse failed: " + t.slice(0, 160)); }
+      const items = j?.items;
+      if (!Array.isArray(items)) throw new Error("List schema unexpected: " + t.slice(0, 160));
+      return items;
+    }
+
+    async function fetchQuoteChunk(symbols){
       const q = encodeURIComponent(symbols.join(","));
       const url = WORKER_BASE + "/quote?symbols=" + q;
 
       const r = await fetch(url, { cache: "no-store" });
       const text = await r.text();
-
-      if (!r.ok) {
-        throw new Error("Worker HTTP " + r.status + " " + text.slice(0, 160));
-      }
+      if (!r.ok) throw new Error("Worker /quote HTTP " + r.status + " " + text.slice(0, 160));
 
       let json;
-      try {
-        json = JSON.parse(text);
-      } catch {
-        throw new Error("JSON parse failed: " + text.slice(0, 180));
-      }
+      try { json = JSON.parse(text); }
+      catch { throw new Error("Quote JSON parse failed: " + text.slice(0, 160)); }
 
       const result = json?.quoteResponse?.result;
-      if (!Array.isArray(result)) {
-        throw new Error("Unexpected response schema: " + text.slice(0, 180));
+      if (!Array.isArray(result)) throw new Error("Quote schema unexpected: " + text.slice(0, 160));
+
+      for (const it of result) {
+        if (it?.symbol) QUOTE_MAP.set(it.symbol, it);
+      }
+    }
+
+    async function fetchAllQuotes(allSymbols){
+      // URL 길이 제한 때문에 청크로 쪼갬
+      // 너무 크게 잡으면 414/431 에러 나기 쉬움
+      const CHUNK = 120;
+      const CONCURRENCY = 3;
+
+      const chunks = [];
+      for (let i = 0; i < allSymbols.length; i += CHUNK) {
+        chunks.push(allSymbols.slice(i, i + CHUNK));
       }
 
-      const map = new Map();
-      for (const it of result) {
-        if (it?.symbol) map.set(it.symbol, it);
+      let idx = 0;
+      async function workerLoop(){
+        while (idx < chunks.length) {
+          const my = idx++;
+          await fetchQuoteChunk(chunks[my]);
+        }
       }
-      return map;
+
+      const workers = [];
+      for (let k = 0; k < CONCURRENCY; k++) workers.push(workerLoop());
+      await Promise.all(workers);
     }
 
     function renderIndex(item, priceEl, chgEl){
@@ -505,119 +540,147 @@
       chgEl.textContent = sign + fmtPrice(chg) + " (" + sign + fmtPct(pct) + ")";
     }
 
-    function escapeHtml(s){
-      return String(s ?? "")
-        .replaceAll("&","&amp;")
-        .replaceAll("<","&lt;")
-        .replaceAll(">","&gt;")
-        .replaceAll('"',"&quot;")
-        .replaceAll("'","&#039;");
-    }
+    function applyFilterAndSearch(){
+      const q = ($("q").value || "").trim().toLowerCase();
 
-    // ✅ 종목/심볼을 한 줄로 (줄바꿈 방지)
-    function nameCellHtml(name, symbol){
-      return `
-        <div class="nameCell">
-          <span class="nm">${escapeHtml(name || "-")}</span>
-          <span class="sy">${escapeHtml(symbol)}</span>
-        </div>
-      `;
-    }
+      let base = ALL_LIST;
+      if (MARKET_FILTER !== "ALL") base = base.filter(x => x.market === MARKET_FILTER);
 
-    function rowHtmlCommon(name, symbol, price, pct, vol, chg){
-      const cls = classBySign(pct);
-      const cls2 = classBySign(chg);
-      const sign = (chg > 0) ? "+" : "";
-      const signPct = (pct > 0) ? "+" : "";
-      return `
-        <tr>
-          <td>${nameCellHtml(name, symbol)}</td>
-          <td class="right">${fmtPrice(price)}</td>
-          <td class="right ${cls2}">${sign}${fmtPrice(chg)}</td>
-          <td class="right ${cls}">${signPct}${fmtPct(pct)}</td>
-          <td class="right">${fmtNum(vol)}</td>
-        </tr>
-      `;
-    }
-
-    function renderTables(items){
-      const baseTbody = $("baseTbody");
-
-      if (!items.length) {
-        baseTbody.innerHTML = `<tr><td colspan="5" class="muted">표시할 종목이 없습니다.</td></tr>`;
-      } else {
-        baseTbody.innerHTML = items.map(it => rowHtmlCommon(
-          it.shortName || it.longName || it.symbol,
-          it.symbol,
-          it.regularMarketPrice,
-          it.regularMarketChangePercent,
-          it.regularMarketVolume,
-          it.regularMarketChange
-        )).join("");
+      if (q) {
+        base = base.filter(x => {
+          const name = (x.name || "").toLowerCase();
+          const code = (x.code || "").toLowerCase();
+          return name.includes(q) || code.includes(q);
+        });
       }
 
-      const topVol = [...items]
-        .filter(it => typeof it.regularMarketVolume === "number")
-        .sort((a,b) => (b.regularMarketVolume || 0) - (a.regularMarketVolume || 0))
-        .slice(0, 10);
+      // 가나다 정렬 (종목명 기준)
+      base = base.slice().sort((a,b) => {
+        const an = a.name || "";
+        const bn = b.name || "";
+        const c = an.localeCompare(bn, "ko");
+        if (c !== 0) return c;
+        return (a.code || "").localeCompare((b.code || ""), "en");
+      });
 
-      $("volTbody").innerHTML = topVol.length
-        ? topVol.map(it => `
-            <tr>
-              <td>${nameCellHtml(it.shortName || it.longName || it.symbol, it.symbol)}</td>
-              <td class="right">${fmtPrice(it.regularMarketPrice)}</td>
-              <td class="right ${classBySign(it.regularMarketChangePercent)}">${(it.regularMarketChangePercent>0?"+":"")}${fmtPct(it.regularMarketChangePercent)}</td>
-              <td class="right">${fmtNum(it.regularMarketVolume)}</td>
-            </tr>
-          `).join("")
-        : `<tr><td colspan="4" class="muted">거래량 데이터가 없습니다.</td></tr>`;
+      VIEW_ROWS = base;
+      $("countPill").textContent = "표시 " + VIEW_ROWS.length.toLocaleString("ko-KR") + "개";
+      $("hintLine").textContent = q
+        ? "검색/필터 적용됨"
+        : "가나다순으로 정렬됨";
 
-      const topUp = [...items]
-        .filter(it => typeof it.regularMarketChangePercent === "number")
-        .sort((a,b) => (b.regularMarketChangePercent || -999) - (a.regularMarketChangePercent || -999))
-        .slice(0, 10);
+      renderAllTable();
+    }
 
-      $("chgTbody").innerHTML = topUp.length
-        ? topUp.map(it => `
-            <tr>
-              <td>${nameCellHtml(it.shortName || it.longName || it.symbol, it.symbol)}</td>
-              <td class="right">${fmtPrice(it.regularMarketPrice)}</td>
-              <td class="right ${classBySign(it.regularMarketChange)}">${(it.regularMarketChange>0?"+":"")}${fmtPrice(it.regularMarketChange)}</td>
-              <td class="right ${classBySign(it.regularMarketChangePercent)}">${(it.regularMarketChangePercent>0?"+":"")}${fmtPct(it.regularMarketChangePercent)}</td>
-            </tr>
-          `).join("")
-        : `<tr><td colspan="4" class="muted">등락률 데이터가 없습니다.</td></tr>`;
+    function renderAllTable(){
+      const tb = $("allTbody");
+      if (!VIEW_ROWS.length) {
+        tb.innerHTML = `<tr><td colspan="5" class="muted">표시할 종목이 없습니다.</td></tr>`;
+        return;
+      }
+
+      // 전종목이라 DOM이 너무 커질 수 있어서 "상단 800개만" 기본 렌더 + 스크롤 추가 렌더
+      // 필요하면 LIMIT를 더 올려도 됨
+      const LIMIT = 900;
+      const rows = VIEW_ROWS.slice(0, LIMIT);
+
+      tb.innerHTML = rows.map(x => {
+        const symbol = x.code + (x.market === "KOSDAQ" ? ".KQ" : ".KS");
+        const it = QUOTE_MAP.get(symbol);
+
+        const price = it?.regularMarketPrice ?? null;
+        const chg = it?.regularMarketChange ?? null;
+        const pct = it?.regularMarketChangePercent ?? null;
+        const vol = it?.regularMarketVolume ?? null;
+
+        const clsChg = classBySign(chg);
+        const clsPct = classBySign(pct);
+        const signChg = (typeof chg === "number" && chg > 0) ? "+" : "";
+        const signPct = (typeof pct === "number" && pct > 0) ? "+" : "";
+
+        return `
+          <tr>
+            <td>${nameCellHtml(x.name, symbol)}</td>
+            <td class="right">${fmtPrice(price)}</td>
+            <td class="right ${clsChg}">${signChg}${fmtPrice(chg)}</td>
+            <td class="right ${clsPct}">${signPct}${fmtPct(pct)}</td>
+            <td class="right">${fmtNum(vol)}</td>
+          </tr>
+        `;
+      }).join("") + (VIEW_ROWS.length > LIMIT ? `
+        <tr><td colspan="5" class="muted">너무 많아서 상단 ${LIMIT.toLocaleString("ko-KR")}개만 표시 중입니다. 검색으로 좁혀보세요.</td></tr>
+      ` : "");
+    }
+
+    function setMarketBtn(activeId){
+      ["btnAll","btnKospi","btnKosdaq"].forEach(id => $(id).classList.remove("active"));
+      $(activeId).classList.add("active");
     }
 
     async function refreshAll(){
       setStatus("warn", "상태: 로딩");
       $("lastUpdated").textContent = "-";
+      $("hintLine").textContent = "전종목을 불러오는 중…";
+      $("countPill").textContent = "-";
+      $("allTbody").innerHTML = `<tr><td colspan="5" class="muted">데이터를 불러오는 중…</td></tr>`;
+      QUOTE_MAP = new Map();
 
       try {
-        const symbols = [...INDEX_SYMBOLS, ...DEFAULT_SYMBOLS];
-        const map = await fetchQuote(symbols);
+        // 1) 전종목 리스트
+        ALL_LIST = await fetchList("ALL");
+        $("countPill").textContent = "총 " + ALL_LIST.length.toLocaleString("ko-KR") + "개";
 
-        renderIndex(map.get("^KS11"), $("kospiPrice"), $("kospiChg"));
-        renderIndex(map.get("^KQ11"), $("kosdaqPrice"), $("kosdaqChg"));
+        // 2) 지수 + 전종목 시세 심볼 만들기
+        const symbols = [];
+        symbols.push(...INDEX_SYMBOLS);
+        for (const x of ALL_LIST) {
+          const sym = x.code + (x.market === "KOSDAQ" ? ".KQ" : ".KS");
+          symbols.push(sym);
+        }
 
-        const items = DEFAULT_SYMBOLS.map(sym => map.get(sym)).filter(Boolean);
-        renderTables(items);
+        // 3) 시세를 청크로 가져오기
+        await fetchAllQuotes(symbols);
+
+        // 4) 지수 렌더
+        renderIndex(QUOTE_MAP.get("^KS11"), $("kospiPrice"), $("kospiChg"));
+        renderIndex(QUOTE_MAP.get("^KQ11"), $("kosdaqPrice"), $("kosdaqChg"));
+
+        // 5) 테이블 렌더(필터/검색 적용)
+        applyFilterAndSearch();
 
         $("lastUpdated").textContent = new Date().toLocaleString("ko-KR");
         setStatus("ok", "상태: 정상");
       } catch (e) {
         console.error(e);
         setStatus("error", "상태: 오류");
-        $("baseTbody").innerHTML = `<tr><td colspan="5" class="muted">데이터를 불러오지 못했습니다. (콘솔 로그 확인)</td></tr>`;
-        $("volTbody").innerHTML = `<tr><td colspan="4" class="muted">데이터를 불러오지 못했습니다.</td></tr>`;
-        $("chgTbody").innerHTML = `<tr><td colspan="4" class="muted">데이터를 불러오지 못했습니다.</td></tr>`;
+        $("hintLine").textContent = "불러오기에 실패했습니다.";
+        $("allTbody").innerHTML = `<tr><td colspan="5" class="muted">데이터를 불러오지 못했습니다.</td></tr>`;
       }
     }
 
     $("btnRefresh").addEventListener("click", refreshAll);
+    $("btnNaver").addEventListener("click", () => window.open("https://finance.naver.com/", "_blank", "noopener,noreferrer"));
 
-    $("btnNaver").addEventListener("click", () => {
-      window.open("https://finance.naver.com/", "_blank", "noopener,noreferrer");
+    $("btnAll").addEventListener("click", () => {
+      MARKET_FILTER = "ALL";
+      setMarketBtn("btnAll");
+      applyFilterAndSearch();
+    });
+    $("btnKospi").addEventListener("click", () => {
+      MARKET_FILTER = "KOSPI";
+      setMarketBtn("btnKospi");
+      applyFilterAndSearch();
+    });
+    $("btnKosdaq").addEventListener("click", () => {
+      MARKET_FILTER = "KOSDAQ";
+      setMarketBtn("btnKosdaq");
+      applyFilterAndSearch();
+    });
+
+    let qTimer = null;
+    $("q").addEventListener("input", () => {
+      clearTimeout(qTimer);
+      qTimer = setTimeout(applyFilterAndSearch, 120);
     });
 
     try { (adsbygoogle = window.adsbygoogle || []).push({}); } catch {}
