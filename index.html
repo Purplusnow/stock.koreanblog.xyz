@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>K-Stock Dashboard v1.0.2 - 국내주식 MVP</title>
+  <title>K-Stock Dashboard v1.0.3 - 국내주식 MVP</title>
   <meta name="description" content="국내 주요 종목과 관심종목의 가격/등락/거래량을 빠르게 확인합니다." />
 
   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4640178123605595"
@@ -13,7 +13,6 @@
     :root{
       --bg:#070b12;
       --panel:#0b1220cc;
-      --panel2:#0b1220aa;
       --stroke:#1e2a3c;
       --text:#e8eefc;
       --muted:#9fb2d0;
@@ -195,19 +194,6 @@
       align-items:center;
       justify-content:center;
     }
-    .watch-head{
-      display:flex;
-      justify-content:space-between;
-      align-items:flex-end;
-      gap:10px;
-      margin-bottom: 10px;
-    }
-    .watch-head .hint{
-      color: var(--muted);
-      font-size: 13px;
-      line-height:1.35;
-      text-align:right;
-    }
     .input-row{
       display:flex;
       gap:10px;
@@ -318,7 +304,7 @@
         <div class="logo" aria-hidden="true"></div>
         <div>
           <h1>K-Stock Dashboard</h1>
-          <div class="sub">v1.0.2 · 국내주식 MVP</div>
+          <div class="sub">v1.0.3 · 국내주식 MVP</div>
         </div>
       </div>
 
@@ -356,7 +342,7 @@
           </div>
 
           <div class="note">
-            안내: 거래량 TOP10과 상승률 TOP10은 현재 “기본 30개 + 내가 추가한 종목” 범위에서 계산됩니다.
+            안내: 거래량 TOP10과 상승률 TOP10은 현재 목록(기본 30개 + 내가 추가한 종목) 범위에서 계산됩니다.
           </div>
 
           <div class="adbox">
@@ -378,16 +364,13 @@
           </div>
         </div>
         <div class="card-b">
-          <div class="watch-head">
-            <div class="input-row" style="flex:1">
-              <input id="symbolInput" type="text" placeholder="심볼 입력 예: 005930.KS / 035420.KS / 247540.KQ" />
-              <button class="btn primary" id="addBtn" style="height:44px; padding:0 16px;">추가</button>
-            </div>
+          <div class="input-row">
+            <input id="symbolInput" type="text" placeholder="심볼 입력 예: 005930.KS / 035420.KS / 247540.KQ" />
+            <button class="btn primary" id="addBtn" style="height:44px; padding:0 16px;">추가</button>
           </div>
 
           <div class="note">
             심볼은 005930.KS / 247540.KQ 형식으로 입력해줘.
-            코스피/코스닥 대부분은 .KS / .KQ를 붙이면 돼.
           </div>
 
           <div class="chip-wrap" id="chipWrap"></div>
@@ -438,9 +421,9 @@
   </div>
 
   <script>
-    const WORKER_BASE = "https://billowing-snowflake-fc22.purplusnow.workers.dev";
+    var WORKER_BASE = "https://billowing-snowflake-fc22.purplusnow.workers.dev";
 
-    const DEFAULT_30 = [
+    var DEFAULT_30 = [
       ["삼성전자","005930.KS"],
       ["SK하이닉스","000660.KS"],
       ["현대차","005380.KS"],
@@ -473,33 +456,34 @@
       ["에코프로","086520.KQ"]
     ];
 
-    const el = (id) => document.getElementById(id);
-    const statusPill = el("statusPill");
-    const updatedAt = el("updatedAt");
+    function el(id){ return document.getElementById(id); }
 
-    const kospiPrice = el("kospiPrice");
-    const kospiChg = el("kospiChg");
-    const kosdaqPrice = el("kosdaqPrice");
-    const kosdaqChg = el("kosdaqChg");
+    var statusPill = el("statusPill");
+    var updatedAt = el("updatedAt");
 
-    const chipWrap = el("chipWrap");
-    const symbolInput = el("symbolInput");
+    var kospiPrice = el("kospiPrice");
+    var kospiChg = el("kospiChg");
+    var kosdaqPrice = el("kosdaqPrice");
+    var kosdaqChg = el("kosdaqChg");
 
-    const volTop10 = el("volTop10");
-    const chgTop10 = el("chgTop10");
+    var chipWrap = el("chipWrap");
+    var symbolInput = el("symbolInput");
 
-    const footerTime = el("footerTime");
+    var volTop10 = el("volTop10");
+    var chgTop10 = el("chgTop10");
 
-    const LS_KEY = "kstock_watchlist_custom_v1";
+    var footerTime = el("footerTime");
+    var LS_KEY = "kstock_watchlist_custom_v1";
 
-    function fmtNum(n, digits=2){
+    function fmtNum(n, digits){
+      if (digits === undefined) digits = 2;
       if(n === null || n === undefined || Number.isNaN(n)) return "-";
       return Number(n).toLocaleString("ko-KR", { maximumFractionDigits: digits });
     }
     function fmtPct(n){
       if(n === null || n === undefined || Number.isNaN(n)) return "-";
-      const v = Number(n);
-      const s = (v >= 0 ? "+" : "") + v.toFixed(2) + "%";
+      var v = Number(n);
+      var s = (v >= 0 ? "+" : "") + v.toFixed(2) + "%";
       return s;
     }
     function clsBySign(n){
@@ -515,11 +499,11 @@
 
     function loadCustom(){
       try{
-        const raw = localStorage.getItem(LS_KEY);
+        var raw = localStorage.getItem(LS_KEY);
         if(!raw) return [];
-        const arr = JSON.parse(raw);
+        var arr = JSON.parse(raw);
         if(!Array.isArray(arr)) return [];
-        return arr.filter(x => Array.isArray(x) && x.length === 2);
+        return arr.filter(function(x){ return Array.isArray(x) && x.length === 2; });
       }catch(e){
         return [];
       }
@@ -528,64 +512,85 @@
       localStorage.setItem(LS_KEY, JSON.stringify(arr));
     }
 
-    function renderChips(list){
-      chipWrap.innerHTML = "";
-      list.forEach(([name, sym], idx) => {
-        const d = document.createElement("div");
-        d.className = "chip";
-        d.innerHTML = \`
-          <span>\${escapeHtml(name)}</span>
-          <span class="sym">\${escapeHtml(sym)}</span>
-          <button title="삭제" aria-label="삭제">×</button>
-        \`;
-        const btn = d.querySelector("button");
-        btn.addEventListener("click", () => {
-          if(idx < DEFAULT_30.length) return;
-          const customs = loadCustom();
-          const customIndex = idx - DEFAULT_30.length;
-          customs.splice(customIndex, 1);
-          saveCustom(customs);
-          refreshAll();
-        });
-        chipWrap.appendChild(d);
+    function escapeHtml(s){
+      return String(s).replace(/[&<>"']/g, function(m){
+        return ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;" })[m];
       });
     }
 
-    function escapeHtml(s){
-      return String(s).replace(/[&<>"']/g, m => ({
-        "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"
-      }[m]));
-    }
-
     function mergeList(){
-      const customs = loadCustom();
-      const merged = [...DEFAULT_30, ...customs];
-      const seen = new Set();
-      const out = [];
-      for(const [name, sym] of merged){
-        const key = sym.toUpperCase();
-        if(seen.has(key)) continue;
-        seen.add(key);
-        out.push([name, key]);
+      var customs = loadCustom();
+      var merged = DEFAULT_30.concat(customs);
+      var seen = {};
+      var out = [];
+      for(var i=0;i<merged.length;i++){
+        var name = merged[i][0];
+        var sym = String(merged[i][1] || "").toUpperCase();
+        if(!sym) continue;
+        if(seen[sym]) continue;
+        seen[sym] = true;
+        out.push([name, sym]);
       }
       return out;
     }
 
+    function renderChips(list){
+      chipWrap.innerHTML = "";
+      for(var i=0;i<list.length;i++){
+        (function(idx){
+          var name = list[idx][0];
+          var sym = list[idx][1];
+
+          var d = document.createElement("div");
+          d.className = "chip";
+
+          var spanName = document.createElement("span");
+          spanName.textContent = name;
+
+          var spanSym = document.createElement("span");
+          spanSym.className = "sym";
+          spanSym.textContent = sym;
+
+          var btn = document.createElement("button");
+          btn.title = "삭제";
+          btn.setAttribute("aria-label","삭제");
+          btn.textContent = "×";
+
+          btn.addEventListener("click", function(){
+            if(idx < DEFAULT_30.length) return;
+            var customs = loadCustom();
+            var customIndex = idx - DEFAULT_30.length;
+            customs.splice(customIndex, 1);
+            saveCustom(customs);
+            refreshAll();
+          });
+
+          d.appendChild(spanName);
+          d.appendChild(spanSym);
+          d.appendChild(btn);
+          chipWrap.appendChild(d);
+        })(i);
+      }
+    }
+
     async function fetchQuotes(symbols){
-      const q = encodeURIComponent(symbols.join(","));
-      const url = \`\${WORKER_BASE}/quote?symbols=\${q}\`;
-      const r = await fetch(url, { cache: "no-store" });
-      const j = await r.json();
+      var q = encodeURIComponent(symbols.join(","));
+      var url = WORKER_BASE + "/quote?symbols=" + q;
+      var r = await fetch(url, { cache: "no-store" });
+      var j = await r.json();
       if(!r.ok){
         throw new Error("HTTP " + r.status + " " + JSON.stringify(j));
       }
-      const result = j?.quoteResponse?.result || [];
-      const err = j?.quoteResponse?.error || null;
-      return { result, err };
+      var result = (j && j.quoteResponse && j.quoteResponse.result) ? j.quoteResponse.result : [];
+      var err = (j && j.quoteResponse) ? j.quoteResponse.error : null;
+      return { result: result, err: err };
     }
 
     function pickIndex(result, sym){
-      return result.find(x => x.symbol === sym) || null;
+      for(var i=0;i<result.length;i++){
+        if(result[i] && result[i].symbol === sym) return result[i];
+      }
+      return null;
     }
 
     function updateIndexUI(item, priceEl, chgEl){
@@ -595,79 +600,92 @@
         return;
       }
       priceEl.textContent = fmtNum(item.regularMarketPrice, 2);
-      const pct = item.regularMarketChangePercent;
-      const chg = item.regularMarketChange;
-      const line = \`\${fmtNum(chg, 2)} (\${fmtPct(pct)})\`;
+
+      var pct = item.regularMarketChangePercent;
+      var chg = item.regularMarketChange;
+      var line = fmtNum(chg, 2) + " (" + fmtPct(pct) + ")";
       chgEl.textContent = line;
       chgEl.className = "c " + clsBySign(pct);
     }
 
     function buildRankingRows(items){
-      const rows = items.map(x => {
-        const name = x.shortName || x.symbol;
-        const price = x.regularMarketPrice;
-        const pct = x.regularMarketChangePercent;
-        const vol = x.regularMarketVolume;
-        return { name, price, pct, vol };
-      });
+      var rows = [];
+      for(var i=0;i<items.length;i++){
+        var x = items[i] || {};
+        var name = x.shortName || x.symbol;
+        rows.push({
+          name: name,
+          price: x.regularMarketPrice,
+          pct: x.regularMarketChangePercent,
+          vol: x.regularMarketVolume
+        });
+      }
 
-      const byVol = [...rows]
-        .filter(r => r.vol !== null && r.vol !== undefined)
-        .sort((a,b) => (b.vol||0) - (a.vol||0))
-        .slice(0, 10);
+      var byVol = rows
+        .filter(function(r){ return r.vol !== null && r.vol !== undefined; })
+        .sort(function(a,b){ return (b.vol||0) - (a.vol||0); })
+        .slice(0,10);
 
-      const byChg = [...rows]
-        .filter(r => r.pct !== null && r.pct !== undefined)
-        .sort((a,b) => (b.pct||0) - (a.pct||0))
-        .slice(0, 10);
+      var byChg = rows
+        .filter(function(r){ return r.pct !== null && r.pct !== undefined; })
+        .sort(function(a,b){ return (b.pct||0) - (a.pct||0); })
+        .slice(0,10);
 
-      return { byVol, byChg };
+      return { byVol: byVol, byChg: byChg };
     }
 
     function renderTable(tbody, list){
       tbody.innerHTML = "";
       if(!list.length){
-        const tr = document.createElement("tr");
-        tr.innerHTML = \`<td colspan="4" class="muted">데이터 없음</td>\`;
-        tbody.appendChild(tr);
+        var tr0 = document.createElement("tr");
+        tr0.innerHTML = '<td colspan="4" class="muted">데이터 없음</td>';
+        tbody.appendChild(tr0);
         return;
       }
-      list.forEach(r => {
-        const tr = document.createElement("tr");
-        tr.innerHTML = \`
-          <td>\${escapeHtml(r.name)}</td>
-          <td class="num">\${fmtNum(r.price, 2)}</td>
-          <td class="num \${clsBySign(r.pct)}">\${fmtPct(r.pct)}</td>
-          <td class="num">\${r.vol == null ? "-" : Number(r.vol).toLocaleString("ko-KR")}</td>
-        \`;
+
+      for(var i=0;i<list.length;i++){
+        var r = list[i];
+        var tr = document.createElement("tr");
+        tr.innerHTML =
+          "<td>" + escapeHtml(r.name) + "</td>" +
+          "<td class=\"num\">" + fmtNum(r.price, 2) + "</td>" +
+          "<td class=\"num " + clsBySign(r.pct) + "\">" + fmtPct(r.pct) + "</td>" +
+          "<td class=\"num\">" + (r.vol == null ? "-" : Number(r.vol).toLocaleString("ko-KR")) + "</td>";
         tbody.appendChild(tr);
-      });
+      }
     }
 
     async function refreshAll(){
       try{
         setStatus(true, "불러오는 중");
-        const list = mergeList();
+
+        var list = mergeList();
         renderChips(list);
 
-        const symbols = ["^KS11","^KQ11", ...list.map(x => x[1])];
-        const { result, err } = await fetchQuotes(symbols);
+        var symbols = ["^KS11","^KQ11"];
+        for(var i=0;i<list.length;i++){
+          symbols.push(list[i][1]);
+        }
 
-        const ks = pickIndex(result, "^KS11");
-        const kq = pickIndex(result, "^KQ11");
+        var resp = await fetchQuotes(symbols);
+        var result = resp.result;
+        var err = resp.err;
+
+        var ks = pickIndex(result, "^KS11");
+        var kq = pickIndex(result, "^KQ11");
 
         updateIndexUI(ks, kospiPrice, kospiChg);
         updateIndexUI(kq, kosdaqPrice, kosdaqChg);
 
-        const now = new Date();
+        var now = new Date();
         updatedAt.textContent = "업데이트: " + now.toLocaleString("ko-KR");
         footerTime.textContent = "마지막 업데이트: " + now.toLocaleString("ko-KR");
 
-        const stockOnly = result.filter(x => x.symbol && !x.symbol.startsWith("^"));
-        const { byVol, byChg } = buildRankingRows(stockOnly);
+        var stockOnly = result.filter(function(x){ return x && x.symbol && String(x.symbol).indexOf("^") !== 0; });
+        var ranking = buildRankingRows(stockOnly);
 
-        renderTable(volTop10, byVol);
-        renderTable(chgTop10, byChg);
+        renderTable(volTop10, ranking.byVol);
+        renderTable(chgTop10, ranking.byChg);
 
         if(err && err.length){
           setStatus(false, "일부 오류 (" + err.length + "건)");
@@ -678,37 +696,34 @@
 
         try{
           (adsbygoogle = window.adsbygoogle || []).push({});
-        }catch(e){
-          // 광고는 환경에 따라 실패해도 기능에는 영향 없게 둠
-        }
+        }catch(e){}
       }catch(e){
         setStatus(false, "오류");
         console.error(e);
       }
     }
 
-    el("addBtn").addEventListener("click", () => {
-      const v = symbolInput.value.trim().toUpperCase();
+    el("addBtn").addEventListener("click", function(){
+      var v = String(symbolInput.value || "").trim().toUpperCase();
       if(!v) return;
 
-      const m = v.match(/^(\d{4,6})\.(KS|KQ)$/);
+      var m = v.match(/^(\d{4,6})\.(KS|KQ)$/);
       if(!m){
         alert("형식이 올바르지 않아.\n예: 005930.KS / 247540.KQ");
         return;
       }
 
-      const code = m[1];
-      const sym = v;
+      var sym = v;
 
-      const customs = loadCustom();
-      const exists = mergeList().some(x => x[1] === sym);
+      var exists = mergeList().some(function(x){ return x[1] === sym; });
       if(exists){
         symbolInput.value = "";
         refreshAll();
         return;
       }
 
-      customs.push([code, sym]);
+      var customs = loadCustom();
+      customs.push([m[1], sym]);
       saveCustom(customs);
 
       symbolInput.value = "";
@@ -716,11 +731,11 @@
     });
 
     el("refreshBtn").addEventListener("click", refreshAll);
-    el("naverBtn").addEventListener("click", () => {
+    el("naverBtn").addEventListener("click", function(){
       window.open("https://finance.naver.com/", "_blank");
     });
 
-    symbolInput.addEventListener("keydown", (e) => {
+    symbolInput.addEventListener("keydown", function(e){
       if(e.key === "Enter") el("addBtn").click();
     });
 
