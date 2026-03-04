@@ -3,409 +3,317 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>K-Stock Dashboard v1.0.2</title>
-  <meta name="description" content="국내주식 MVP 대시보드: 코스피/코스닥, 관심종목, 거래량/상승률 TOP10(관심종목 기준)" />
+  <title>K-Stock Dashboard v1.0.2 - 국내주식 MVP</title>
+  <meta name="description" content="국내 주요 종목과 관심종목의 가격/등락/거래량을 빠르게 확인합니다." />
 
-  <!-- AdSense (공통 스크립트) -->
-  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4640178123605595" crossorigin="anonymous"></script>
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4640178123605595"
+    crossorigin="anonymous"></script>
 
   <style>
     :root{
-      --bg0:#070c12;
-      --bg1:#0a1220;
-      --card:#0c1727cc;
-      --card2:#0b1524f0;
-      --stroke:#1a2a40;
-      --stroke2:#223651;
-      --text:#e9f1ff;
-      --muted:#9fb2cc;
-      --muted2:#7f93b3;
-      --good:#21d07a;
-      --bad:#ff4d6d;
-      --chip:#0c1a2f;
-      --chipStroke:#1c314c;
-      --btn:#172a44;
-      --btn2:#1f3b63;
-      --focus:#3b82f6;
-      --shadow: 0 12px 40px rgba(0,0,0,.45);
-      --radius: 18px;
-      --radius2: 14px;
+      --bg:#070b12;
+      --panel:#0b1220cc;
+      --panel2:#0b1220aa;
+      --stroke:#1e2a3c;
+      --text:#e8eefc;
+      --muted:#9fb2d0;
+      --accent:#3b82f6;
+      --danger:#ef4444;
+      --ok:#22c55e;
+      --shadow: 0 20px 60px rgba(0,0,0,.45);
+      --radius: 22px;
     }
-    *{box-sizing:border-box}
+    *{ box-sizing:border-box; }
     body{
       margin:0;
-      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Noto Sans KR", Arial, "Apple SD Gothic Neo", sans-serif;
-      color:var(--text);
-      background:
-        radial-gradient(1200px 700px at 70% 20%, rgba(42, 202, 255, .10), transparent 55%),
-        radial-gradient(900px 600px at 20% 10%, rgba(78, 109, 255, .10), transparent 55%),
-        radial-gradient(700px 700px at 85% 80%, rgba(0, 255, 170, .08), transparent 55%),
-        linear-gradient(180deg, var(--bg0), var(--bg1) 55%, #060a10);
-      min-height:100vh;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Apple SD Gothic Neo", "Noto Sans KR", sans-serif;
+      background: radial-gradient(1200px 600px at 15% 0%, rgba(59,130,246,.25), transparent 60%),
+                  radial-gradient(900px 500px at 85% 10%, rgba(34,197,94,.16), transparent 60%),
+                  radial-gradient(900px 500px at 30% 90%, rgba(239,68,68,.12), transparent 60%),
+                  var(--bg);
+      color: var(--text);
     }
-    a{color:inherit}
     .wrap{
-      width:min(1280px, calc(100% - 28px));
-      margin: 18px auto 26px;
+      max-width: 1320px;
+      margin: 0 auto;
+      padding: 22px 18px 40px;
     }
-
-    /* Top bar */
-    .topbar{
+    header{
       display:flex;
-      align-items:center;
+      align-items:flex-start;
       justify-content:space-between;
-      gap:12px;
-      padding: 10px 2px 14px;
+      gap:14px;
+      margin-bottom:18px;
     }
     .brand{
       display:flex;
       align-items:center;
       gap:12px;
-      min-width: 220px;
+      min-width: 240px;
     }
     .logo{
-      width:38px;height:38px;border-radius:14px;
-      background: linear-gradient(135deg, rgba(59,130,246,.95), rgba(16,185,129,.85));
-      box-shadow: 0 10px 30px rgba(0,0,0,.35);
+      width:42px;height:42px;border-radius:14px;
+      background: linear-gradient(135deg, rgba(59,130,246,.95), rgba(34,197,94,.75));
+      box-shadow: 0 10px 30px rgba(59,130,246,.25);
     }
     .brand h1{
       margin:0;
-      font-size: 26px;
+      font-size: 28px;
       letter-spacing: .2px;
-      line-height: 1.1;
     }
-    .sub{
+    .brand .sub{
       margin-top:2px;
-      font-size: 13px;
       color: var(--muted);
+      font-size: 13px;
     }
-    .actions{
+    .top-actions{
       display:flex;
-      gap:10px;
       align-items:center;
+      gap:10px;
       flex-wrap:wrap;
       justify-content:flex-end;
     }
-    .btn{
-      appearance:none;
-      border:1px solid rgba(255,255,255,.10);
-      background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
+    .pill{
+      padding:10px 14px;
+      border: 1px solid var(--stroke);
+      background: rgba(255,255,255,.03);
       color: var(--text);
-      padding: 10px 14px;
-      border-radius: 14px;
-      cursor:pointer;
-      box-shadow: 0 10px 26px rgba(0,0,0,.28);
-      transition: transform .08s ease, border-color .15s ease, background .15s ease;
-      font-weight: 600;
-      letter-spacing: .2px;
+      border-radius: 999px;
+      font-size: 13px;
       display:flex;
       align-items:center;
       gap:8px;
-      height: 40px;
-      white-space:nowrap;
+      box-shadow: 0 12px 35px rgba(0,0,0,.25);
+      user-select:none;
     }
-    .btn:hover{ transform: translateY(-1px); border-color: rgba(255,255,255,.18); }
-    .btn:active{ transform: translateY(0px); }
+    .btn{
+      cursor:pointer;
+      border: 1px solid var(--stroke);
+      background: rgba(255,255,255,.04);
+      color: var(--text);
+      border-radius: 14px;
+      padding: 10px 14px;
+      font-size: 14px;
+      box-shadow: 0 12px 35px rgba(0,0,0,.25);
+      transition: transform .05s ease, background .15s ease, border-color .15s ease;
+    }
+    .btn:hover{ background: rgba(255,255,255,.06); border-color: rgba(59,130,246,.35); }
+    .btn:active{ transform: translateY(1px); }
     .btn.primary{
-      background: linear-gradient(180deg, rgba(59,130,246,.32), rgba(59,130,246,.18));
-      border-color: rgba(59,130,246,.35);
+      background: linear-gradient(180deg, rgba(59,130,246,.95), rgba(59,130,246,.75));
+      border-color: rgba(59,130,246,.65);
     }
-    .btn.primary:hover{ border-color: rgba(59,130,246,.55); }
-    .btn.link{
-      text-decoration:none;
-    }
-
-    /* Grid */
     .grid{
       display:grid;
-      grid-template-columns: 1.1fr .9fr;
-      gap: 14px;
-      margin-top: 6px;
+      grid-template-columns: 1.2fr .9fr;
+      gap:16px;
+      align-items:start;
     }
-    @media (max-width: 980px){
-      .grid{ grid-template-columns: 1fr; }
-      .brand h1{ font-size: 24px; }
-    }
-
     .card{
-      background: linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.02));
-      border: 1px solid rgba(255,255,255,.08);
+      background: linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.02));
+      border: 1px solid rgba(255,255,255,.06);
       border-radius: var(--radius);
       box-shadow: var(--shadow);
-      padding: 16px;
-      position:relative;
       overflow:hidden;
+      position:relative;
     }
     .card::before{
       content:"";
-      position:absolute; inset:-80px -80px auto auto;
-      width:220px;height:220px;border-radius: 999px;
-      background: radial-gradient(circle at 30% 30%, rgba(59,130,246,.16), transparent 60%);
-      filter: blur(0px);
+      position:absolute; inset:-2px;
+      background: radial-gradient(500px 200px at 10% 0%, rgba(59,130,246,.14), transparent 60%),
+                  radial-gradient(500px 200px at 90% 10%, rgba(34,197,94,.10), transparent 60%);
       pointer-events:none;
     }
-    .card h2{
-      margin: 2px 0 10px;
-      font-size: 22px;
-      letter-spacing: .2px;
+    .card > *{ position:relative; }
+    .card-h{
+      padding:16px 18px 10px;
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-end;
+      gap:12px;
     }
-    .muted{
+    .card-h h2{
+      margin:0;
+      font-size: 22px;
+      letter-spacing:.2px;
+    }
+    .meta{
       color: var(--muted);
       font-size: 13px;
-      line-height: 1.45;
+      text-align:right;
+      line-height:1.35;
+      white-space:nowrap;
     }
-
-    /* Today Market */
-    .marketRow{
+    .card-b{
+      padding: 12px 18px 18px;
+    }
+    .market-row{
       display:grid;
       grid-template-columns: 1fr 1fr;
-      gap: 12px;
-      margin-top: 10px;
+      gap:12px;
+      margin-bottom: 14px;
     }
-    @media (max-width: 640px){
-      .marketRow{ grid-template-columns: 1fr; }
+    .mini{
+      background: rgba(0,0,0,.25);
+      border: 1px solid rgba(255,255,255,.06);
+      border-radius: 18px;
+      padding: 14px 14px;
+      min-height: 92px;
     }
-    .marketBox{
-      border-radius: var(--radius2);
-      border: 1px solid rgba(255,255,255,.08);
-      background: linear-gradient(180deg, rgba(7,12,18,.35), rgba(7,12,18,.15));
-      padding: 12px 12px 10px;
-    }
-    .marketTop{
+    .mini .t{
       display:flex;
-      align-items:flex-end;
       justify-content:space-between;
-      gap:10px;
-    }
-    .kTitle{
-      font-size: 13px;
+      align-items:center;
       color: var(--muted);
-      letter-spacing: .2px;
-    }
-    .kValue{
-      font-size: 28px;
-      font-weight: 800;
-      letter-spacing: .2px;
-      margin-top: 4px;
-    }
-    .kDelta{
       font-size: 13px;
-      font-weight: 700;
-      margin-top: 6px;
-    }
-    .good{ color: var(--good); }
-    .bad{ color: var(--bad); }
-
-    .line{
-      height:1px;
-      background: rgba(255,255,255,.08);
-      margin: 12px 0;
-    }
-
-    /* Ads */
-    .adBox{
-      border-radius: var(--radius2);
-      border: 1px dashed rgba(255,255,255,.14);
-      background: rgba(0,0,0,.12);
-      padding: 10px;
-      min-height: 120px;
-    }
-    .adLabel{
-      font-size: 12px;
-      color: var(--muted2);
       margin-bottom: 8px;
     }
-
-    /* Tables */
-    .twoCols{
-      display:grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 14px;
-      margin-top: 14px;
-    }
-    @media (max-width: 980px){
-      .twoCols{ grid-template-columns: 1fr; }
-    }
-    table{
-      width:100%;
-      border-collapse: collapse;
-      overflow:hidden;
-      border-radius: var(--radius2);
-      border: 1px solid rgba(255,255,255,.08);
-      background: linear-gradient(180deg, rgba(7,12,18,.30), rgba(7,12,18,.14));
-    }
-    thead th{
-      text-align:left;
-      font-size: 12px;
-      color: var(--muted);
+    .mini .p{
+      font-size: 22px;
       font-weight: 700;
-      padding: 12px 12px;
-      border-bottom: 1px solid rgba(255,255,255,.08);
-      letter-spacing: .15px;
+      letter-spacing:.2px;
     }
-    tbody td{
-      padding: 11px 12px;
-      border-bottom: 1px solid rgba(255,255,255,.06);
-      font-size: 13px;
-      color: var(--text);
-      vertical-align: middle;
-    }
-    tbody tr:last-child td{ border-bottom:none; }
-    .sym{
-      font-weight: 800;
-      letter-spacing: .2px;
-    }
-    .right{ text-align:right; }
-    .nowrap{ white-space:nowrap; }
-    .tiny{
-      font-size: 12px;
+    .mini .c{
+      margin-top: 6px;
       color: var(--muted);
+      font-size: 13px;
     }
-
-    /* Watchlist */
-    .watchTop{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:12px;
-      flex-wrap: wrap;
-      margin-top: 2px;
-      margin-bottom: 10px;
+    .note{
+      color: var(--muted);
+      font-size: 13px;
+      line-height:1.5;
+      padding: 10px 0 2px;
     }
-    .inputRow{
-      display:flex;
-      gap:10px;
-      align-items:center;
-      width: 100%;
-    }
-    .input{
-      flex: 1;
-      height: 42px;
-      border-radius: 14px;
-      border: 1px solid rgba(255,255,255,.10);
-      background: rgba(5,10,16,.42);
-      color: var(--text);
-      padding: 10px 12px;
-      outline:none;
-      font-size: 14px;
-      box-shadow: inset 0 0 0 1px rgba(0,0,0,.12);
-    }
-    .input:focus{
-      border-color: rgba(59,130,246,.55);
-      box-shadow: 0 0 0 3px rgba(59,130,246,.18);
-    }
-    .btnAdd{
-      height: 42px;
-      padding: 0 14px;
-      border-radius: 14px;
-      border: 1px solid rgba(59,130,246,.40);
-      background: linear-gradient(180deg, rgba(59,130,246,.30), rgba(59,130,246,.16));
-      color: var(--text);
-      font-weight: 800;
-      cursor:pointer;
-      letter-spacing: .2px;
+    .adbox{
+      margin-top: 14px;
+      border: 1px dashed rgba(255,255,255,.10);
+      border-radius: 18px;
+      padding: 10px;
+      background: rgba(0,0,0,.18);
+      min-height: 290px;
       display:flex;
       align-items:center;
       justify-content:center;
-      min-width: 74px;
-      box-shadow: 0 10px 26px rgba(0,0,0,.28);
     }
-    .btnAdd:hover{ border-color: rgba(59,130,246,.62); transform: translateY(-1px); }
-    .btnAdd:active{ transform: translateY(0px); }
-    .help{
-      width:100%;
+    .watch-head{
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-end;
+      gap:10px;
+      margin-bottom: 10px;
+    }
+    .watch-head .hint{
       color: var(--muted);
       font-size: 13px;
-      line-height: 1.5;
+      line-height:1.35;
+      text-align:right;
     }
-
-    .chips{
+    .input-row{
       display:flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      margin-top: 10px;
+      gap:10px;
+      align-items:center;
+    }
+    input[type="text"]{
+      flex:1;
+      height: 44px;
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,.10);
+      background: rgba(0,0,0,.25);
+      color: var(--text);
+      padding: 0 14px;
+      outline:none;
+      font-size: 14px;
+    }
+    input[type="text"]::placeholder{ color: rgba(159,178,208,.65); }
+    .chip-wrap{
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px;
+      margin-top: 12px;
     }
     .chip{
       display:flex;
       align-items:center;
       gap:10px;
-      padding: 9px 10px 9px 12px;
-      background: linear-gradient(180deg, rgba(12,26,47,.82), rgba(12,26,47,.62));
-      border: 1px solid rgba(255,255,255,.10);
+      padding: 10px 12px;
       border-radius: 999px;
-      box-shadow: 0 12px 30px rgba(0,0,0,.25);
+      background: rgba(0,0,0,.25);
+      border: 1px solid rgba(255,255,255,.08);
+      color: var(--text);
+      font-size: 14px;
     }
-    .chip .name{
-      font-weight: 800;
-      letter-spacing: .15px;
-    }
-    .chip .code{
-      color: var(--muted);
-      font-weight: 700;
-      font-size: 12px;
-    }
+    .chip .sym{ color: var(--muted); font-weight:600; }
     .chip button{
+      cursor:pointer;
+      border:none;
       width: 26px;
       height: 26px;
       border-radius: 999px;
-      border: 1px solid rgba(255,255,255,.14);
-      background: rgba(0,0,0,.18);
+      background: rgba(255,255,255,.08);
       color: var(--text);
-      cursor:pointer;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      font-weight: 900;
-      line-height: 1;
+      font-size: 16px;
+      line-height: 26px;
     }
-    .chip button:hover{
-      border-color: rgba(255,255,255,.22);
-      background: rgba(255,255,255,.06);
-    }
-
-    .footer{
+    .tables{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap:16px;
       margin-top: 16px;
-      text-align:center;
-      color: var(--muted2);
-      font-size: 12px;
     }
-
-    .toast{
-      position: fixed;
-      left: 50%;
-      bottom: 18px;
-      transform: translateX(-50%);
-      background: rgba(10,18,32,.92);
-      border: 1px solid rgba(255,255,255,.10);
-      border-radius: 999px;
-      padding: 10px 14px;
-      font-size: 13px;
-      color: var(--text);
-      box-shadow: var(--shadow);
-      display:none;
-      max-width: calc(100% - 24px);
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
+    table{
+      width:100%;
+      border-collapse:separate;
+      border-spacing:0 10px;
     }
-
-    .badge{
-      display:inline-flex;
-      align-items:center;
-      gap:6px;
-      padding: 6px 10px;
-      border-radius: 999px;
-      border: 1px solid rgba(255,255,255,.10);
-      background: rgba(0,0,0,.14);
+    th{
+      text-align:left;
       color: var(--muted);
+      font-size: 13px;
+      font-weight:600;
+      padding: 0 10px 6px;
+    }
+    td{
+      padding: 12px 10px;
+      background: rgba(0,0,0,.22);
+      border: 1px solid rgba(255,255,255,.06);
+      border-left:none;
+      border-right:none;
+      font-size: 14px;
+    }
+    tr td:first-child{
+      border-left: 1px solid rgba(255,255,255,.06);
+      border-top-left-radius: 14px;
+      border-bottom-left-radius: 14px;
+      font-weight:700;
+    }
+    tr td:last-child{
+      border-right: 1px solid rgba(255,255,255,.06);
+      border-top-right-radius: 14px;
+      border-bottom-right-radius: 14px;
+      text-align:right;
+    }
+    .num{ text-align:right; font-variant-numeric: tabular-nums; }
+    .pos{ color: var(--ok); }
+    .neg{ color: var(--danger); }
+    .muted{ color: var(--muted); }
+    .footer{
+      margin-top: 18px;
+      color: rgba(159,178,208,.65);
       font-size: 12px;
-      font-weight: 700;
+      text-align:center;
+    }
+    @media (max-width: 980px){
+      .grid{ grid-template-columns: 1fr; }
+      .tables{ grid-template-columns: 1fr; }
+      header{ align-items:flex-start; }
+      .meta{ text-align:left; white-space:normal; }
+      .top-actions{ justify-content:flex-start; }
     }
   </style>
 </head>
 <body>
   <div class="wrap">
-    <div class="topbar">
+    <header>
       <div class="brand">
         <div class="logo" aria-hidden="true"></div>
         <div>
@@ -414,533 +322,408 @@
         </div>
       </div>
 
-      <div class="actions">
-        <span class="badge" id="statusBadge">상태: 준비</span>
-        <button class="btn primary" id="btnRefresh" type="button">새로고침</button>
-        <a class="btn link" href="https://finance.naver.com/" target="_blank" rel="noopener noreferrer">네이버증권</a>
+      <div class="top-actions">
+        <div class="pill" id="statusPill">상태: 준비중</div>
+        <button class="btn primary" id="refreshBtn">새로고침</button>
+        <button class="btn" id="naverBtn">네이버증권</button>
       </div>
-    </div>
+    </header>
 
     <div class="grid">
-      <section class="card" aria-label="오늘 시장">
-        <div style="display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap;">
-          <h2 style="margin:0;">오늘 시장</h2>
-          <div class="muted">업데이트: <span id="updatedAt">-</span></div>
+      <section class="card">
+        <div class="card-h">
+          <h2>오늘 시장</h2>
+          <div class="meta" id="updatedAt">업데이트: -</div>
         </div>
-
-        <div class="marketRow">
-          <div class="marketBox">
-            <div class="marketTop">
-              <div class="kTitle">코스피</div>
-              <div class="tiny" id="kospiSymbol">^KS11</div>
+        <div class="card-b">
+          <div class="market-row">
+            <div class="mini">
+              <div class="t">
+                <span>코스피</span>
+                <span class="muted">^KS11</span>
+              </div>
+              <div class="p" id="kospiPrice">-</div>
+              <div class="c" id="kospiChg">-</div>
             </div>
-            <div class="kValue" id="kospiPrice">-</div>
-            <div class="kDelta" id="kospiDelta">-</div>
+            <div class="mini">
+              <div class="t">
+                <span>코스닥</span>
+                <span class="muted">^KQ11</span>
+              </div>
+              <div class="p" id="kosdaqPrice">-</div>
+              <div class="c" id="kosdaqChg">-</div>
+            </div>
           </div>
 
-          <div class="marketBox">
-            <div class="marketTop">
-              <div class="kTitle">코스닥</div>
-              <div class="tiny" id="kosdaqSymbol">^KQ11</div>
-            </div>
-            <div class="kValue" id="kosdaqPrice">-</div>
-            <div class="kDelta" id="kosdaqDelta">-</div>
+          <div class="note">
+            안내: 거래량 TOP10과 상승률 TOP10은 현재 “기본 30개 + 내가 추가한 종목” 범위에서 계산됩니다.
           </div>
-        </div>
 
-        <div class="line"></div>
-
-        <div class="muted" id="noteLine">
-          안내: 거래량 TOP10과 상승률 TOP10은 현재 “기본 30개 + 내가 추가한 종목” 범위에서 계산됩니다.
-        </div>
-
-        <div class="line"></div>
-
-        <div class="adBox">
-          <div class="adLabel">광고</div>
-          <!-- AdSense unit -->
-          <ins class="adsbygoogle"
-               style="display:block; width:100%; height:280px"
-               data-ad-client="ca-pub-4640178123605595"
-               data-ad-slot="1089514795"
-               data-ad-format="auto"
-               data-full-width-responsive="true"></ins>
-          <script>
-            (adsbygoogle = window.adsbygoogle || []).push({});
-          </script>
+          <div class="adbox">
+            <ins class="adsbygoogle"
+              style="display:block"
+              data-ad-client="ca-pub-4640178123605595"
+              data-ad-slot="1089514795"
+              data-ad-format="auto"
+              data-full-width-responsive="true"></ins>
+          </div>
         </div>
       </section>
 
-      <section class="card" aria-label="관심종목 관리">
-        <div class="watchTop">
-          <h2 style="margin:0;">관심종목 관리</h2>
-          <div class="muted">기본 30개 + 내가 추가한 종목(로컬 저장)</div>
+      <section class="card">
+        <div class="card-h">
+          <h2>관심종목 관리</h2>
+          <div class="meta">
+            <div>기본 30개 + 내가 추가한 종목(로컬 저장)</div>
+          </div>
         </div>
+        <div class="card-b">
+          <div class="watch-head">
+            <div class="input-row" style="flex:1">
+              <input id="symbolInput" type="text" placeholder="심볼 입력 예: 005930.KS / 035420.KS / 247540.KQ" />
+              <button class="btn primary" id="addBtn" style="height:44px; padding:0 16px;">추가</button>
+            </div>
+          </div>
 
-        <div class="inputRow">
-          <input id="symInput" class="input" placeholder="심볼 입력 예: 005930.KS / 035420.KS / 247540.KQ" />
-          <button id="btnAdd" class="btnAdd" type="button">추가</button>
-        </div>
+          <div class="note">
+            심볼은 005930.KS / 247540.KQ 형식으로 입력해줘.
+            코스피/코스닥 대부분은 .KS / .KQ를 붙이면 돼.
+          </div>
 
-        <div class="help" style="margin-top:10px;">
-          심볼은 Yahoo 형식 사용. 코스피/코스닥 대부분은 .KS / .KQ 를 붙이면 됩니다.
-          예: 삼성전자 005930.KS, 카카오 035720.KS, NAVER 035420.KS
-        </div>
-
-        <div class="chips" id="chips"></div>
-
-        <div class="line"></div>
-
-        <div class="muted" id="proxyInfo">
-          데이터 소스: Cloudflare Worker 프록시 사용
+          <div class="chip-wrap" id="chipWrap"></div>
         </div>
       </section>
     </div>
 
-    <div class="twoCols">
-      <section class="card" aria-label="거래량 TOP10">
-        <h2 style="margin:0 0 10px;">거래량 TOP10</h2>
-        <table>
-          <thead>
-            <tr>
-              <th>종목</th>
-              <th class="right">가격</th>
-              <th class="right">등락률</th>
-              <th class="right">거래량</th>
-            </tr>
-          </thead>
-          <tbody id="tbodyVol"></tbody>
-        </table>
-      </section>
-
-      <section class="card" aria-label="상승률 TOP10">
-        <h2 style="margin:0 0 10px;">상승률 TOP10</h2>
-        <table>
-          <thead>
-            <tr>
-              <th>종목</th>
-              <th class="right">가격</th>
-              <th class="right">등락률</th>
-              <th class="right">거래량</th>
-            </tr>
-          </thead>
-          <tbody id="tbodyGain"></tbody>
-        </table>
-      </section>
-    </div>
-
-    <section class="card" style="margin-top:14px;" aria-label="관심종목 테이블">
-      <h2 style="margin:0 0 10px;">관심종목</h2>
-      <table>
-        <thead>
-          <tr>
-            <th>종목</th>
-            <th class="right">가격</th>
-            <th class="right">등락</th>
-            <th class="right">등락률</th>
-            <th class="right">거래량</th>
-          </tr>
-        </thead>
-        <tbody id="tbodyWatch"></tbody>
-      </table>
+    <section class="card" style="margin-top:16px;">
+      <div class="card-h">
+        <h2>랭킹</h2>
+        <div class="meta">기준: 현재 목록(기본+추가)</div>
+      </div>
+      <div class="card-b">
+        <div class="tables">
+          <div>
+            <div class="note" style="margin-bottom:6px;">거래량 TOP10</div>
+            <table>
+              <thead>
+                <tr>
+                  <th>종목</th>
+                  <th class="num">가격</th>
+                  <th class="num">등락률</th>
+                  <th class="num">거래량</th>
+                </tr>
+              </thead>
+              <tbody id="volTop10"></tbody>
+            </table>
+          </div>
+          <div>
+            <div class="note" style="margin-bottom:6px;">상승률 TOP10</div>
+            <table>
+              <thead>
+                <tr>
+                  <th>종목</th>
+                  <th class="num">가격</th>
+                  <th class="num">등락률</th>
+                  <th class="num">거래량</th>
+                </tr>
+              </thead>
+              <tbody id="chgTop10"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
     </section>
 
-    <div class="footer">
-      마지막 업데이트: <span id="lastBuild">2026-03-04 11:55 (KST)</span>
-    </div>
+    <div class="footer" id="footerTime"></div>
   </div>
 
-  <div class="toast" id="toast"></div>
-
   <script>
-    // Worker 프록시 주소 (확정)
     const WORKER_BASE = "https://billowing-snowflake-fc22.purplusnow.workers.dev";
 
-    // 로컬 저장 키
-    const LS_KEY_USER = "kstock_user_symbols_v1";
-    const LS_KEY_NAMES = "kstock_symbol_names_v1";
-
-    // 기본 30개 (원하면 여기만 바꾸면 됨)
-    const DEFAULT_SYMBOLS = [
-      "005930.KS","000660.KS","005380.KS","000270.KS","035420.KS","035720.KS",
-      "373220.KS","207940.KS","068270.KS","005490.KS","006400.KS","051910.KS",
-      "005935.KS","105560.KS","055550.KS","086790.KS","028260.KS","012450.KS",
-      "015760.KS","030200.KS","066570.KS","003490.KS","323410.KS","259960.KS",
-      "000810.KS","267250.KS","096770.KS","034020.KS","247540.KQ","086520.KQ"
+    const DEFAULT_30 = [
+      ["삼성전자","005930.KS"],
+      ["SK하이닉스","000660.KS"],
+      ["현대차","005380.KS"],
+      ["기아","000270.KS"],
+      ["NAVER","035420.KS"],
+      ["카카오","035720.KS"],
+      ["LG에너지솔루션","373220.KS"],
+      ["삼성바이오로직스","207940.KS"],
+      ["셀트리온","068270.KS"],
+      ["POSCO홀딩스","005490.KS"],
+      ["삼성SDI","006400.KS"],
+      ["LG화학","051910.KS"],
+      ["삼성전자우","005935.KS"],
+      ["KB금융","105560.KS"],
+      ["신한지주","055550.KS"],
+      ["하나금융지주","086790.KS"],
+      ["삼성물산","028260.KS"],
+      ["한화에어로스페이스","012450.KS"],
+      ["한국전력","015760.KS"],
+      ["KT","030200.KS"],
+      ["LG전자","066570.KS"],
+      ["대한항공","003490.KS"],
+      ["카카오뱅크","323410.KS"],
+      ["크래프톤","259960.KS"],
+      ["삼성화재","000810.KS"],
+      ["HD현대","267250.KS"],
+      ["SK이노베이션","096770.KS"],
+      ["두산에너빌리티","034020.KS"],
+      ["에코프로비엠","247540.KQ"],
+      ["에코프로","086520.KQ"]
     ];
 
-    // 기본 이름(있는 것만 표시, 나머지는 심볼 그대로)
-    const DEFAULT_NAMES = {
-      "005930.KS":"삼성전자",
-      "000660.KS":"SK하이닉스",
-      "005380.KS":"현대차",
-      "000270.KS":"기아",
-      "035420.KS":"NAVER",
-      "035720.KS":"카카오",
-      "373220.KS":"LG에너지솔루션",
-      "207940.KS":"삼성바이오로직스",
-      "068270.KS":"셀트리온",
-      "005490.KS":"POSCO홀딩스",
-      "006400.KS":"삼성SDI",
-      "051910.KS":"LG화학",
-      "005935.KS":"삼성전자우",
-      "105560.KS":"KB금융",
-      "055550.KS":"신한지주",
-      "086790.KS":"하나금융지주",
-      "028260.KS":"삼성물산",
-      "012450.KS":"한화에어로스페이스",
-      "015760.KS":"한국전력",
-      "030200.KS":"KT",
-      "066570.KS":"LG전자",
-      "247540.KQ":"에코프로비엠",
-      "086520.KQ":"에코프로"
-    };
+    const el = (id) => document.getElementById(id);
+    const statusPill = el("statusPill");
+    const updatedAt = el("updatedAt");
 
-    const dom = {
-      statusBadge: document.getElementById("statusBadge"),
-      btnRefresh: document.getElementById("btnRefresh"),
-      updatedAt: document.getElementById("updatedAt"),
-      kospiPrice: document.getElementById("kospiPrice"),
-      kospiDelta: document.getElementById("kospiDelta"),
-      kosdaqPrice: document.getElementById("kosdaqPrice"),
-      kosdaqDelta: document.getElementById("kosdaqDelta"),
-      symInput: document.getElementById("symInput"),
-      btnAdd: document.getElementById("btnAdd"),
-      chips: document.getElementById("chips"),
-      tbodyVol: document.getElementById("tbodyVol"),
-      tbodyGain: document.getElementById("tbodyGain"),
-      tbodyWatch: document.getElementById("tbodyWatch"),
-      toast: document.getElementById("toast"),
-      proxyInfo: document.getElementById("proxyInfo"),
-    };
+    const kospiPrice = el("kospiPrice");
+    const kospiChg = el("kospiChg");
+    const kosdaqPrice = el("kosdaqPrice");
+    const kosdaqChg = el("kosdaqChg");
 
-    function toast(msg){
-      dom.toast.textContent = msg;
-      dom.toast.style.display = "block";
-      clearTimeout(toast._t);
-      toast._t = setTimeout(()=> dom.toast.style.display = "none", 2200);
-    }
+    const chipWrap = el("chipWrap");
+    const symbolInput = el("symbolInput");
 
-    function setStatus(text, tone="ready"){
-      dom.statusBadge.textContent = "상태: " + text;
-      if (tone === "ok"){
-        dom.statusBadge.style.borderColor = "rgba(33,208,122,.35)";
-        dom.statusBadge.style.background = "rgba(33,208,122,.08)";
-        dom.statusBadge.style.color = "rgba(233,241,255,.95)";
-      } else if (tone === "bad"){
-        dom.statusBadge.style.borderColor = "rgba(255,77,109,.35)";
-        dom.statusBadge.style.background = "rgba(255,77,109,.08)";
-        dom.statusBadge.style.color = "rgba(233,241,255,.95)";
-      } else {
-        dom.statusBadge.style.borderColor = "rgba(255,255,255,.10)";
-        dom.statusBadge.style.background = "rgba(0,0,0,.14)";
-        dom.statusBadge.style.color = "rgba(159,178,204,.95)";
-      }
-    }
+    const volTop10 = el("volTop10");
+    const chgTop10 = el("chgTop10");
 
-    function fmtNumber(n){
-      if (n === null || n === undefined || Number.isNaN(n)) return "-";
-      return n.toLocaleString("ko-KR");
-    }
-    function fmtPrice(n){
-      if (n === null || n === undefined || Number.isNaN(n)) return "-";
-      return n.toLocaleString("ko-KR", { maximumFractionDigits: 2 });
+    const footerTime = el("footerTime");
+
+    const LS_KEY = "kstock_watchlist_custom_v1";
+
+    function fmtNum(n, digits=2){
+      if(n === null || n === undefined || Number.isNaN(n)) return "-";
+      return Number(n).toLocaleString("ko-KR", { maximumFractionDigits: digits });
     }
     function fmtPct(n){
-      if (n === null || n === undefined || Number.isNaN(n)) return "-";
-      const sign = n > 0 ? "+" : "";
-      return sign + n.toFixed(2) + "%";
+      if(n === null || n === undefined || Number.isNaN(n)) return "-";
+      const v = Number(n);
+      const s = (v >= 0 ? "+" : "") + v.toFixed(2) + "%";
+      return s;
     }
-    function fmtDelta(n){
-      if (n === null || n === undefined || Number.isNaN(n)) return "-";
-      const sign = n > 0 ? "+" : "";
-      return sign + n.toLocaleString("ko-KR", { maximumFractionDigits: 2 });
+    function clsBySign(n){
+      if(n === null || n === undefined || Number.isNaN(n)) return "";
+      return Number(n) >= 0 ? "pos" : "neg";
+    }
+    function setStatus(ok, msg){
+      statusPill.textContent = "상태: " + msg;
+      statusPill.style.borderColor = ok ? "rgba(34,197,94,.45)" : "rgba(239,68,68,.45)";
+      statusPill.style.color = ok ? "rgba(34,197,94,.95)" : "rgba(239,68,68,.95)";
+      statusPill.style.background = ok ? "rgba(34,197,94,.08)" : "rgba(239,68,68,.08)";
     }
 
-    function isValidSymbol(s){
-      // 아주 느슨한 검증: 숫자6자리 + .KS/.KQ, 또는 ^지수
-      if (!s) return false;
-      return /^[0-9]{6}\.(KS|KQ)$/.test(s) || /^\^?[A-Z0-9\.\-]+$/.test(s);
-    }
-
-    function loadUserSymbols(){
+    function loadCustom(){
       try{
-        const raw = localStorage.getItem(LS_KEY_USER);
-        if (!raw) return [];
+        const raw = localStorage.getItem(LS_KEY);
+        if(!raw) return [];
         const arr = JSON.parse(raw);
-        if (!Array.isArray(arr)) return [];
-        return arr.filter(x => typeof x === "string");
+        if(!Array.isArray(arr)) return [];
+        return arr.filter(x => Array.isArray(x) && x.length === 2);
       }catch(e){
         return [];
       }
     }
-
-    function saveUserSymbols(arr){
-      localStorage.setItem(LS_KEY_USER, JSON.stringify(arr));
+    function saveCustom(arr){
+      localStorage.setItem(LS_KEY, JSON.stringify(arr));
     }
 
-    function loadNames(){
-      try{
-        const raw = localStorage.getItem(LS_KEY_NAMES);
-        if (!raw) return {...DEFAULT_NAMES};
-        const obj = JSON.parse(raw);
-        return { ...DEFAULT_NAMES, ...(obj || {}) };
-      }catch(e){
-        return {...DEFAULT_NAMES};
-      }
-    }
-
-    function saveNames(obj){
-      localStorage.setItem(LS_KEY_NAMES, JSON.stringify(obj));
-    }
-
-    function getAllSymbols(){
-      const user = loadUserSymbols();
-      const all = [...DEFAULT_SYMBOLS];
-      for (const s of user){
-        if (!all.includes(s)) all.push(s);
-      }
-      return all;
-    }
-
-    function getName(symbol, names){
-      return names[symbol] || symbol;
-    }
-
-    function renderChips(){
-      const names = loadNames();
-      const user = loadUserSymbols();
-      dom.chips.innerHTML = "";
-
-      const list = [...DEFAULT_SYMBOLS, ...user.filter(s => !DEFAULT_SYMBOLS.includes(s))];
-
-      for (const sym of list){
-        const chip = document.createElement("div");
-        chip.className = "chip";
-
-        const nm = document.createElement("div");
-        nm.className = "name";
-        nm.textContent = getName(sym, names);
-
-        const code = document.createElement("div");
-        code.className = "code";
-        code.textContent = sym;
-
-        const del = document.createElement("button");
-        del.type = "button";
-        del.title = DEFAULT_SYMBOLS.includes(sym) ? "기본 종목은 삭제할 수 없습니다" : "삭제";
-        del.textContent = "×";
-        del.disabled = DEFAULT_SYMBOLS.includes(sym);
-        del.style.opacity = del.disabled ? ".45" : "1";
-        del.style.cursor = del.disabled ? "not-allowed" : "pointer";
-
-        del.addEventListener("click", ()=>{
-          if (DEFAULT_SYMBOLS.includes(sym)) return;
-          const cur = loadUserSymbols().filter(x => x !== sym);
-          saveUserSymbols(cur);
-          renderChips();
+    function renderChips(list){
+      chipWrap.innerHTML = "";
+      list.forEach(([name, sym], idx) => {
+        const d = document.createElement("div");
+        d.className = "chip";
+        d.innerHTML = \`
+          <span>\${escapeHtml(name)}</span>
+          <span class="sym">\${escapeHtml(sym)}</span>
+          <button title="삭제" aria-label="삭제">×</button>
+        \`;
+        const btn = d.querySelector("button");
+        btn.addEventListener("click", () => {
+          if(idx < DEFAULT_30.length) return;
+          const customs = loadCustom();
+          const customIndex = idx - DEFAULT_30.length;
+          customs.splice(customIndex, 1);
+          saveCustom(customs);
           refreshAll();
         });
-
-        chip.appendChild(nm);
-        chip.appendChild(code);
-        chip.appendChild(del);
-        dom.chips.appendChild(chip);
-      }
-    }
-
-    async function fetchJson(url){
-      const res = await fetch(url, { cache: "no-store" });
-      if (!res.ok){
-        const txt = await res.text().catch(()=> "");
-        throw new Error("HTTP " + res.status + " " + (txt ? txt.slice(0,120) : ""));
-      }
-      return await res.json();
-    }
-
-    async function fetchQuote(symbolsArray){
-      const joined = symbolsArray.join(",");
-      const url = `${WORKER_BASE}/quote?symbols=${encodeURIComponent(joined)}`;
-      return await fetchJson(url);
-    }
-
-    function pickQuote(result, symbol){
-      const list = result?.quoteResponse?.result || [];
-      return list.find(x => x.symbol === symbol) || null;
-    }
-
-    function toRow(q, names){
-      // Yahoo quote fields (있을 때만 사용)
-      const symbol = q?.symbol || "-";
-      const name = getName(symbol, names);
-
-      const price = q?.regularMarketPrice ?? null;
-      const chg = q?.regularMarketChange ?? null;
-      const chgPct = q?.regularMarketChangePercent ?? null;
-      const vol = q?.regularMarketVolume ?? null;
-
-      return {
-        symbol,
-        name,
-        price,
-        chg,
-        chgPct,
-        vol
-      };
-    }
-
-    function renderMarket(kospiQ, kosdaqQ){
-      function setMarket(domPrice, domDelta, q){
-        if (!q){
-          domPrice.textContent = "-";
-          domDelta.textContent = "-";
-          domDelta.className = "kDelta";
-          return;
-        }
-        const price = q.regularMarketPrice ?? null;
-        const chg = q.regularMarketChange ?? null;
-        const pct = q.regularMarketChangePercent ?? null;
-
-        domPrice.textContent = fmtPrice(price);
-
-        const deltaText = `${fmtDelta(chg)} (${fmtPct(pct)})`;
-        domDelta.textContent = deltaText;
-
-        const up = (pct ?? 0) >= 0;
-        domDelta.className = "kDelta " + (up ? "good" : "bad");
-      }
-
-      setMarket(dom.kospiPrice, dom.kospiDelta, kospiQ);
-      setMarket(dom.kosdaqPrice, dom.kosdaqDelta, kosdaqQ);
-    }
-
-    function renderTopTables(rows){
-      const byVol = [...rows].sort((a,b)=> (b.vol||0) - (a.vol||0)).slice(0,10);
-      const byGain = [...rows].sort((a,b)=> (b.chgPct||-999) - (a.chgPct||-999)).slice(0,10);
-
-      dom.tbodyVol.innerHTML = byVol.map(r => trTop(r)).join("");
-      dom.tbodyGain.innerHTML = byGain.map(r => trTop(r)).join("");
-    }
-
-    function trTop(r){
-      const pctClass = (r.chgPct ?? 0) >= 0 ? "good" : "bad";
-      return `
-        <tr>
-          <td>
-            <div class="sym">${escapeHtml(r.name)}</div>
-            <div class="tiny nowrap">${escapeHtml(r.symbol)}</div>
-          </td>
-          <td class="right nowrap">${fmtPrice(r.price)}</td>
-          <td class="right nowrap ${pctClass}">${fmtPct(r.chgPct ?? null)}</td>
-          <td class="right nowrap">${fmtNumber(r.vol)}</td>
-        </tr>
-      `;
-    }
-
-    function renderWatch(rows){
-      dom.tbodyWatch.innerHTML = rows.map(r=>{
-        const pctClass = (r.chgPct ?? 0) >= 0 ? "good" : "bad";
-        const chgClass = (r.chg ?? 0) >= 0 ? "good" : "bad";
-        return `
-          <tr>
-            <td>
-              <div class="sym">${escapeHtml(r.name)}</div>
-              <div class="tiny nowrap">${escapeHtml(r.symbol)}</div>
-            </td>
-            <td class="right nowrap">${fmtPrice(r.price)}</td>
-            <td class="right nowrap ${chgClass}">${fmtDelta(r.chg ?? null)}</td>
-            <td class="right nowrap ${pctClass}">${fmtPct(r.chgPct ?? null)}</td>
-            <td class="right nowrap">${fmtNumber(r.vol)}</td>
-          </tr>
-        `;
-      }).join("");
+        chipWrap.appendChild(d);
+      });
     }
 
     function escapeHtml(s){
-      return String(s)
-        .replaceAll("&","&amp;")
-        .replaceAll("<","&lt;")
-        .replaceAll(">","&gt;")
-        .replaceAll('"',"&quot;")
-        .replaceAll("'","&#039;");
+      return String(s).replace(/[&<>"']/g, m => ({
+        "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"
+      }[m]));
+    }
+
+    function mergeList(){
+      const customs = loadCustom();
+      const merged = [...DEFAULT_30, ...customs];
+      const seen = new Set();
+      const out = [];
+      for(const [name, sym] of merged){
+        const key = sym.toUpperCase();
+        if(seen.has(key)) continue;
+        seen.add(key);
+        out.push([name, key]);
+      }
+      return out;
+    }
+
+    async function fetchQuotes(symbols){
+      const q = encodeURIComponent(symbols.join(","));
+      const url = \`\${WORKER_BASE}/quote?symbols=\${q}\`;
+      const r = await fetch(url, { cache: "no-store" });
+      const j = await r.json();
+      if(!r.ok){
+        throw new Error("HTTP " + r.status + " " + JSON.stringify(j));
+      }
+      const result = j?.quoteResponse?.result || [];
+      const err = j?.quoteResponse?.error || null;
+      return { result, err };
+    }
+
+    function pickIndex(result, sym){
+      return result.find(x => x.symbol === sym) || null;
+    }
+
+    function updateIndexUI(item, priceEl, chgEl){
+      if(!item){
+        priceEl.textContent = "-";
+        chgEl.textContent = "-";
+        return;
+      }
+      priceEl.textContent = fmtNum(item.regularMarketPrice, 2);
+      const pct = item.regularMarketChangePercent;
+      const chg = item.regularMarketChange;
+      const line = \`\${fmtNum(chg, 2)} (\${fmtPct(pct)})\`;
+      chgEl.textContent = line;
+      chgEl.className = "c " + clsBySign(pct);
+    }
+
+    function buildRankingRows(items){
+      const rows = items.map(x => {
+        const name = x.shortName || x.symbol;
+        const price = x.regularMarketPrice;
+        const pct = x.regularMarketChangePercent;
+        const vol = x.regularMarketVolume;
+        return { name, price, pct, vol };
+      });
+
+      const byVol = [...rows]
+        .filter(r => r.vol !== null && r.vol !== undefined)
+        .sort((a,b) => (b.vol||0) - (a.vol||0))
+        .slice(0, 10);
+
+      const byChg = [...rows]
+        .filter(r => r.pct !== null && r.pct !== undefined)
+        .sort((a,b) => (b.pct||0) - (a.pct||0))
+        .slice(0, 10);
+
+      return { byVol, byChg };
+    }
+
+    function renderTable(tbody, list){
+      tbody.innerHTML = "";
+      if(!list.length){
+        const tr = document.createElement("tr");
+        tr.innerHTML = \`<td colspan="4" class="muted">데이터 없음</td>\`;
+        tbody.appendChild(tr);
+        return;
+      }
+      list.forEach(r => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = \`
+          <td>\${escapeHtml(r.name)}</td>
+          <td class="num">\${fmtNum(r.price, 2)}</td>
+          <td class="num \${clsBySign(r.pct)}">\${fmtPct(r.pct)}</td>
+          <td class="num">\${r.vol == null ? "-" : Number(r.vol).toLocaleString("ko-KR")}</td>
+        \`;
+        tbody.appendChild(tr);
+      });
     }
 
     async function refreshAll(){
-      const names = loadNames();
-      setStatus("불러오는 중", "ready");
-
       try{
-        dom.proxyInfo.textContent = `데이터 소스: Cloudflare Worker 프록시 사용 (${WORKER_BASE})`;
+        setStatus(true, "불러오는 중");
+        const list = mergeList();
+        renderChips(list);
 
-        // 1) 지수 먼저
-        const idx = await fetchQuote(["^KS11","^KQ11"]);
-        const kospiQ = pickQuote(idx, "^KS11");
-        const kosdaqQ = pickQuote(idx, "^KQ11");
-        renderMarket(kospiQ, kosdaqQ);
+        const symbols = ["^KS11","^KQ11", ...list.map(x => x[1])];
+        const { result, err } = await fetchQuotes(symbols);
 
-        // 2) 관심종목
-        const symbols = getAllSymbols();
-        const data = await fetchQuote(symbols);
+        const ks = pickIndex(result, "^KS11");
+        const kq = pickIndex(result, "^KQ11");
 
-        const list = (data?.quoteResponse?.result || []).map(q => toRow(q, names));
+        updateIndexUI(ks, kospiPrice, kospiChg);
+        updateIndexUI(kq, kosdaqPrice, kosdaqChg);
 
-        // 정렬(이름/심볼 기준 고정)
-        list.sort((a,b)=> a.symbol.localeCompare(b.symbol, "en"));
+        const now = new Date();
+        updatedAt.textContent = "업데이트: " + now.toLocaleString("ko-KR");
+        footerTime.textContent = "마지막 업데이트: " + now.toLocaleString("ko-KR");
 
-        renderWatch(list);
-        renderTopTables(list);
+        const stockOnly = result.filter(x => x.symbol && !x.symbol.startsWith("^"));
+        const { byVol, byChg } = buildRankingRows(stockOnly);
 
-        dom.updatedAt.textContent = new Date().toLocaleString("ko-KR");
-        setStatus("정상", "ok");
+        renderTable(volTop10, byVol);
+        renderTable(chgTop10, byChg);
+
+        if(err && err.length){
+          setStatus(false, "일부 오류 (" + err.length + "건)");
+          console.log("quote errors:", err);
+        }else{
+          setStatus(true, "정상");
+        }
+
+        try{
+          (adsbygoogle = window.adsbygoogle || []).push({});
+        }catch(e){
+          // 광고는 환경에 따라 실패해도 기능에는 영향 없게 둠
+        }
       }catch(e){
+        setStatus(false, "오류");
         console.error(e);
-        setStatus("오류", "bad");
-        toast("데이터 로드 실패: 콘솔을 확인해 주세요");
-        dom.updatedAt.textContent = new Date().toLocaleString("ko-KR");
       }
     }
 
-    function addSymbol(){
-      const raw = (dom.symInput.value || "").trim();
-      if (!raw){
-        toast("심볼을 입력해 주세요");
-        return;
-      }
-      const sym = raw.toUpperCase();
+    el("addBtn").addEventListener("click", () => {
+      const v = symbolInput.value.trim().toUpperCase();
+      if(!v) return;
 
-      if (!isValidSymbol(sym)){
-        toast("심볼 형식이 올바르지 않습니다");
+      const m = v.match(/^(\d{4,6})\.(KS|KQ)$/);
+      if(!m){
+        alert("형식이 올바르지 않아.\n예: 005930.KS / 247540.KQ");
         return;
       }
-      if (DEFAULT_SYMBOLS.includes(sym)){
-        toast("이미 기본 목록에 있습니다");
-        dom.symInput.value = "";
+
+      const code = m[1];
+      const sym = v;
+
+      const customs = loadCustom();
+      const exists = mergeList().some(x => x[1] === sym);
+      if(exists){
+        symbolInput.value = "";
+        refreshAll();
         return;
       }
-      const cur = loadUserSymbols();
-      if (cur.includes(sym)){
-        toast("이미 추가된 심볼입니다");
-        dom.symInput.value = "";
-        return;
-      }
-      cur.push(sym);
-      saveUserSymbols(cur);
-      dom.symInput.value = "";
-      renderChips();
+
+      customs.push([code, sym]);
+      saveCustom(customs);
+
+      symbolInput.value = "";
       refreshAll();
-      toast("추가 완료");
-    }
-
-    // Events
-    dom.btnRefresh.addEventListener("click", refreshAll);
-    dom.btnAdd.addEventListener("click", addSymbol);
-    dom.symInput.addEventListener("keydown", (e)=>{
-      if (e.key === "Enter") addSymbol();
     });
 
-    // Init
-    renderChips();
-    setStatus("준비", "ready");
+    el("refreshBtn").addEventListener("click", refreshAll);
+    el("naverBtn").addEventListener("click", () => {
+      window.open("https://finance.naver.com/", "_blank");
+    });
+
+    symbolInput.addEventListener("keydown", (e) => {
+      if(e.key === "Enter") el("addBtn").click();
+    });
+
     refreshAll();
   </script>
 </body>
