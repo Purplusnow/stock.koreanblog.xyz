@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>K-Stock Dashboard v1.0.4</title>
-  <meta name="description" content="국내 주식(코스피/코스닥) 대시보드 MVP: 지수, 거래량 TOP10, 상승률 TOP10, 관심종목." />
+  <title>K-Stock Dashboard v1.0.5</title>
+  <meta name="description" content="국내 주식(코스피/코스닥) 대시보드 MVP: 지수, 거래량 TOP10, 상승률 TOP10, 기본 30종목." />
 
   <!-- AdSense -->
   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4640178123605595"
@@ -216,48 +216,6 @@
       font-weight:650;
     }
 
-    .favHd{
-      display:flex; align-items:flex-start; justify-content:space-between; gap:10px; flex-wrap:wrap;
-    }
-    .favHd .mini{color:var(--muted2); font-size:13px}
-    .inputRow{
-      display:flex; gap:10px; margin:10px 0 10px;
-    }
-    .inputRow input{
-      flex:1;
-      height:44px;
-      padding:0 14px;
-      border-radius:14px;
-      border:1px solid var(--stroke2);
-      background:rgba(0,0,0,.20);
-      color:var(--text);
-      outline:none;
-      font-size:14px;
-    }
-    .chipRow{
-      display:flex; flex-wrap:wrap; gap:10px;
-      margin-top:8px;
-    }
-    .chip{
-      display:inline-flex; align-items:center; gap:10px;
-      padding:9px 12px;
-      border-radius:999px;
-      border:1px solid var(--stroke);
-      background:rgba(0,0,0,.18);
-      color:#eaf2ffdd;
-      font-weight:700;
-    }
-    .chip small{color:var(--muted2); font-weight:700}
-    .chip button{
-      width:26px; height:26px; border-radius:999px;
-      border:1px solid var(--stroke2);
-      background:rgba(0,0,0,.25);
-      color:#ffffffcc;
-      cursor:pointer;
-      font-weight:900;
-      line-height:1;
-    }
-
     .foot{
       margin-top:16px;
       color:var(--muted2);
@@ -274,7 +232,7 @@
         <div class="logo"></div>
         <div class="title">
           <b>K-Stock Dashboard</b>
-          <span>v1.0.4 · 국내주식 MVP</span>
+          <span>v1.0.5 · 국내주식 MVP</span>
         </div>
       </div>
 
@@ -323,13 +281,12 @@
           </div>
 
           <div class="note">
-            안내: 거래량 TOP10과 상승률 TOP10은 현재 목록(기본 30개 + 내가 추가한 종목) 범위에서 계산됩니다.
+            안내: 거래량 TOP10과 상승률 TOP10은 기본 30개 종목 범위에서 계산됩니다.
           </div>
 
           <div class="adsBox">
             <div class="label">광고</div>
 
-            <!-- Ad unit -->
             <ins class="adsbygoogle"
                  style="display:block"
                  data-ad-client="ca-pub-4640178123605595"
@@ -341,42 +298,26 @@
       </section>
 
       <section class="card">
-        <div class="hd favHd">
-          <div>
-            <h2 style="margin:0">관심종목 관리</h2>
-            <div class="mini">기본 30개 + 내가 추가한 종목(로컬 저장)</div>
-          </div>
+        <div class="hd">
+          <h2>기본 30종목</h2>
+          <div class="sub">고정 목록</div>
         </div>
 
         <div class="bd">
-          <div class="inputRow">
-            <input id="symbolInput" placeholder="심볼 입력 예: 005930.KS / 035420.KS / 247540.KQ" />
-            <button class="btn" id="btnAdd">추가</button>
-          </div>
-
-          <div class="mini muted" style="margin-bottom:6px">
-            심볼은 Yahoo 형식 사용. 코스피/코스닥 대부분은 .KS / .KQ 를 붙이면 됩니다.
-            (예: 삼성전자 005930.KS, NAVER 035420.KS, 에코프로비엠 247540.KQ)
-          </div>
-
-          <div class="chipRow" id="chipRow"></div>
-
-          <div style="margin-top:14px">
-            <table>
-              <thead>
-                <tr>
-                  <th>종목</th>
-                  <th class="right">가격</th>
-                  <th class="right">등락</th>
-                  <th class="right">등락률</th>
-                  <th class="right">거래량</th>
-                </tr>
-              </thead>
-              <tbody id="favTbody">
-                <tr><td colspan="5" class="muted">데이터를 불러오는 중…</td></tr>
-              </tbody>
-            </table>
-          </div>
+          <table>
+            <thead>
+              <tr>
+                <th>종목</th>
+                <th class="right">가격</th>
+                <th class="right">등락</th>
+                <th class="right">등락률</th>
+                <th class="right">거래량</th>
+              </tr>
+            </thead>
+            <tbody id="baseTbody">
+              <tr><td colspan="5" class="muted">데이터를 불러오는 중…</td></tr>
+            </tbody>
+          </table>
         </div>
       </section>
     </div>
@@ -385,7 +326,7 @@
       <section class="card">
         <div class="hd">
           <h2>거래량 TOP10</h2>
-          <div class="sub">목록 범위 내 계산</div>
+          <div class="sub">기본 30종목 범위</div>
         </div>
         <div class="bd">
           <table>
@@ -407,7 +348,7 @@
       <section class="card">
         <div class="hd">
           <h2>상승률 TOP10</h2>
-          <div class="sub">목록 범위 내 계산</div>
+          <div class="sub">기본 30종목 범위</div>
         </div>
         <div class="bd">
           <table>
@@ -475,7 +416,6 @@
 
     function fmtPrice(n){
       if (n === null || n === undefined || Number.isNaN(n)) return "-";
-      // 지수는 소수점, 주식도 소수점 있을 수 있어서 2자리까지 허용
       const hasDec = Math.abs(n) < 10000 && (String(n).includes(".") || n % 1 !== 0);
       return hasDec ? n.toLocaleString("ko-KR", { maximumFractionDigits: 2 }) : n.toLocaleString("ko-KR");
     }
@@ -492,37 +432,16 @@
       return "";
     }
 
-    function toNaverCode(symbol){
-      // 005930.KS -> 005930 / 247540.KQ -> 247540
-      return (symbol || "").split(".")[0].replace("^","");
+    function escapeHtml(s){
+      return String(s ?? "")
+        .replaceAll("&","&amp;")
+        .replaceAll("<","&lt;")
+        .replaceAll(">","&gt;")
+        .replaceAll('"',"&quot;")
+        .replaceAll("'","&#039;");
     }
 
-    // ===== 로컬 저장(추가 관심종목) =====
-    const LS_KEY = "kstock_extra_symbols_v1";
-
-    function loadExtraSymbols(){
-      try {
-        const raw = localStorage.getItem(LS_KEY);
-        if (!raw) return [];
-        const arr = JSON.parse(raw);
-        return Array.isArray(arr) ? arr.filter(Boolean) : [];
-      } catch {
-        return [];
-      }
-    }
-
-    function saveExtraSymbols(list){
-      localStorage.setItem(LS_KEY, JSON.stringify(list));
-    }
-
-    function getAllSymbols(){
-      const extra = loadExtraSymbols();
-      // 중복 제거
-      const all = [...DEFAULT_SYMBOLS, ...extra];
-      return Array.from(new Set(all));
-    }
-
-    // ===== Worker 호출 (Yahoo v7/finance/quote 응답) =====
+    // ===== Worker 호출 =====
     async function fetchQuote(symbols){
       const q = encodeURIComponent(symbols.join(","));
       const url = WORKER_BASE + "/quote?symbols=" + q;
@@ -531,20 +450,21 @@
       const text = await r.text();
 
       if (!r.ok) {
-        throw new Error("Worker HTTP " + r.status + " " + text.slice(0, 140));
+        throw new Error("Worker HTTP " + r.status + " " + text.slice(0, 200));
       }
 
       let json;
       try {
         json = JSON.parse(text);
       } catch (e) {
-        throw new Error("JSON parse failed: " + text.slice(0, 160));
+        throw new Error("JSON parse failed: " + text.slice(0, 220));
       }
 
-      // Yahoo: { quoteResponse: { result:[...], error:null } }
       const result = json?.quoteResponse?.result;
+
       if (!Array.isArray(result)) {
-        throw new Error("Unexpected response schema");
+        const keys = json && typeof json === "object" ? Object.keys(json).slice(0, 12).join(", ") : "not-object";
+        throw new Error("Unexpected response schema. topKeys=" + keys + " sample=" + text.slice(0, 220));
       }
 
       const map = new Map();
@@ -587,32 +507,20 @@
             <span class="sym">${escapeHtml(symbol)}</span>
           </td>
           <td class="right">${fmtPrice(price)}</td>
-          ${chg === undefined ? "" : `<td class="right ${cls2}">${sign}${fmtPrice(chg)}</td>`}
+          <td class="right ${cls2}">${sign}${fmtPrice(chg)}</td>
           <td class="right ${cls}">${signPct}${fmtPct(pct)}</td>
-          ${vol === undefined ? "" : `<td class="right">${fmtNum(vol)}</td>`}
+          <td class="right">${fmtNum(vol)}</td>
         </tr>
       `;
     }
 
-    function escapeHtml(s){
-      return String(s ?? "")
-        .replaceAll("&","&amp;")
-        .replaceAll("<","&lt;")
-        .replaceAll(">","&gt;")
-        .replaceAll('"',"&quot;")
-        .replaceAll("'","&#039;");
-    }
+    function renderTables(items){
+      const baseTbody = $("baseTbody");
 
-    function renderTables(allItems){
-      // allItems: array of Yahoo quote items (주식만)
-      const items = allItems.filter(it => it && !String(it.symbol || "").startsWith("^"));
-
-      // 관심종목 테이블
-      const favTbody = $("favTbody");
       if (!items.length) {
-        favTbody.innerHTML = `<tr><td colspan="5" class="muted">표시할 종목이 없습니다.</td></tr>`;
+        baseTbody.innerHTML = `<tr><td colspan="5" class="muted">표시할 종목이 없습니다.</td></tr>`;
       } else {
-        favTbody.innerHTML = items.map(it => {
+        baseTbody.innerHTML = items.map(it => {
           return rowHtmlCommon(
             it.shortName || it.longName || it.symbol,
             it.symbol,
@@ -624,7 +532,6 @@
         }).join("");
       }
 
-      // 거래량 TOP10
       const topVol = [...items]
         .filter(it => typeof it.regularMarketVolume === "number")
         .sort((a,b) => (b.regularMarketVolume || 0) - (a.regularMarketVolume || 0))
@@ -641,7 +548,6 @@
           `).join("")
         : `<tr><td colspan="4" class="muted">거래량 데이터가 없습니다.</td></tr>`;
 
-      // 상승률 TOP10
       const topUp = [...items]
         .filter(it => typeof it.regularMarketChangePercent === "number")
         .sort((a,b) => (b.regularMarketChangePercent || -999) - (a.regularMarketChangePercent || -999))
@@ -659,55 +565,19 @@
         : `<tr><td colspan="4" class="muted">등락률 데이터가 없습니다.</td></tr>`;
     }
 
-    function renderChips(){
-      const extra = loadExtraSymbols();
-      const row = $("chipRow");
-      const merged = getAllSymbols();
-
-      // 기본 30개는 칩에서 너무 길어져서, "추가한 종목"만 칩으로 보여줌
-      if (!extra.length) {
-        row.innerHTML = `<span class="muted">추가한 종목이 아직 없어요.</span>`;
-        return;
-      }
-
-      row.innerHTML = extra.map(sym => {
-        return `
-          <span class="chip">
-            ${escapeHtml(sym.split(".")[0])} <small>${escapeHtml(sym)}</small>
-            <button title="삭제" data-del="${escapeHtml(sym)}">×</button>
-          </span>
-        `;
-      }).join("");
-
-      row.querySelectorAll("button[data-del]").forEach(btn => {
-        btn.addEventListener("click", () => {
-          const sym = btn.getAttribute("data-del");
-          const next = loadExtraSymbols().filter(x => x !== sym);
-          saveExtraSymbols(next);
-          renderChips();
-          refreshAll();
-        });
-      });
-    }
-
     // ===== 메인 로직 =====
     async function refreshAll(){
       setStatus("warn", "상태: 로딩");
       $("lastUpdated").textContent = "-";
 
       try {
-        const all = getAllSymbols();
-        const symbols = [...INDEX_SYMBOLS, ...all];
-
+        const symbols = [...INDEX_SYMBOLS, ...DEFAULT_SYMBOLS];
         const map = await fetchQuote(symbols);
 
-        // 지수
         renderIndex(map.get("^KS11"), $("kospiPrice"), $("kospiChg"));
         renderIndex(map.get("^KQ11"), $("kosdaqPrice"), $("kosdaqChg"));
 
-        // 종목 리스트(요청했던 순서 유지)
-        const items = all.map(sym => map.get(sym)).filter(Boolean);
-
+        const items = DEFAULT_SYMBOLS.map(sym => map.get(sym)).filter(Boolean);
         renderTables(items);
 
         const now = new Date();
@@ -717,7 +587,8 @@
       } catch (e) {
         console.error(e);
         setStatus("error", "상태: 오류");
-        $("favTbody").innerHTML = `<tr><td colspan="5" class="muted">데이터를 불러오지 못했습니다. (콘솔 로그 확인)</td></tr>`;
+
+        $("baseTbody").innerHTML = `<tr><td colspan="5" class="muted">데이터를 불러오지 못했습니다. (콘솔 로그 확인)</td></tr>`;
         $("volTbody").innerHTML = `<tr><td colspan="4" class="muted">데이터를 불러오지 못했습니다.</td></tr>`;
         $("chgTbody").innerHTML = `<tr><td colspan="4" class="muted">데이터를 불러오지 못했습니다.</td></tr>`;
       }
@@ -727,47 +598,13 @@
     $("btnRefresh").addEventListener("click", refreshAll);
 
     $("btnNaver").addEventListener("click", () => {
-      // 네이버증권 메인
       window.open("https://finance.naver.com/", "_blank", "noopener,noreferrer");
-    });
-
-    $("btnAdd").addEventListener("click", () => {
-      const input = $("symbolInput");
-      const raw = (input.value || "").trim().toUpperCase();
-
-      if (!raw) return;
-
-      // 간단 정리: 005930 만 넣으면 KS로 가정하지 않고 "그대로" 막지 않음
-      // 사용자가 .KS/.KQ를 붙이는 게 안전
-      let sym = raw;
-
-      // 공백/쉼표 섞인 경우 첫 토큰만
-      sym = sym.split(/[,\s]+/)[0];
-
-      // 최소 검사
-      if (!/^[0-9A-Z^.=]+$/.test(sym)) {
-        alert("심볼 형식이 이상해요. 예: 005930.KS / 247540.KQ");
-        return;
-      }
-
-      const extra = loadExtraSymbols();
-      if (DEFAULT_SYMBOLS.includes(sym) || extra.includes(sym)) {
-        input.value = "";
-        return;
-      }
-
-      extra.push(sym);
-      saveExtraSymbols(extra);
-      input.value = "";
-      renderChips();
-      refreshAll();
     });
 
     // AdSense init
     try { (adsbygoogle = window.adsbygoogle || []).push({}); } catch {}
 
     // init
-    renderChips();
     refreshAll();
   </script>
 </body>
