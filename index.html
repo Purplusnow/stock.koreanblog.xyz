@@ -3,28 +3,26 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>K-Stock Dashboard v1.2.1</title>
+  <title>K-Stock Dashboard v1.2.2</title>
   <meta name="description" content="국내 주식(코스피/코스닥) 대시보드: 네이버 실시간 시세 기반 지수 + 전종목(가나다순)." />
 
   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4640178123605595"
           crossorigin="anonymous"></script>
 
-<!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-Y7L09HLWY8"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', 'G-Y7L09HLWY8');
-</script>
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-Y7L09HLWY8"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-Y7L09HLWY8');
+  </script>
 
   <!-- Event snippet for 페이지 조회 conversion page -->
-<script>
-  gtag('event', 'conversion', {'send_to': 'AW-10836544398/mYjfCKSrmN0ZEI6Xoq8o'});
-</script>
+  <script>
+    gtag('event', 'conversion', {'send_to': 'AW-10836544398/mYjfCKSrmN0ZEI6Xoq8o'});
+  </script>
 
-  
   <style>
     :root{
       --bg1:#050a12; --bg2:#071427;
@@ -95,6 +93,7 @@
 
     .miniLine{color:var(--muted2); font-size:13px; margin:6px 0 0;}
 
+    /* ===== 데스크탑 테이블 ===== */
     table{width:100%; border-collapse:collapse; overflow:hidden;}
     th, td{padding:11px 10px; border-bottom:1px solid var(--stroke); font-size:13px; vertical-align:middle;}
     th{text-align:left; color:var(--muted2); font-weight:750; background:rgba(255,255,255,.03); white-space:nowrap; position:sticky; top:0; backdrop-filter: blur(10px); z-index:2;}
@@ -103,11 +102,68 @@
 
     .nameCell{display:flex; align-items:center; gap:10px; min-width:0;}
     .nameCell .nm{flex:1; min-width:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; font-weight:750;}
-    .nameCell .sy{flex:0 0 auto; color:var(--muted2); font-size:12px; font-weight:700; white-space:nowrap;}
+
     .pillMini{display:inline-flex; align-items:center; gap:6px; padding:6px 10px; border-radius:999px; border:1px solid var(--stroke2);
       background:rgba(0,0,0,.18); color:#eaf2ffcc; font-size:12px; font-weight:750; white-space:nowrap;}
 
     .foot{margin-top:16px; color:var(--muted2); font-size:12px; text-align:right;}
+
+    /* ===== 모바일 카드 리스트(좌우 스크롤 제거) ===== */
+    .tableWrap{
+      margin-top:12px;
+      max-height:68vh;
+      overflow:auto;
+      border-radius:16px;
+      border:1px solid var(--stroke);
+    }
+
+    .mList{display:none; padding:10px;}
+    .mRow{
+      display:flex;
+      flex-direction:column;
+      gap:8px;
+      padding:12px 12px;
+      border:1px solid var(--stroke);
+      background:rgba(0,0,0,.14);
+      border-radius:16px;
+      margin-bottom:10px;
+      min-width:0;
+    }
+    .mTop{display:flex; align-items:center; justify-content:space-between; gap:10px; min-width:0;}
+    .mName{
+      font-weight:850;
+      min-width:0;
+      overflow:hidden;
+      text-overflow:ellipsis;
+      white-space:nowrap;
+      padding-right:6px;
+    }
+    .mPrice{font-weight:900; font-size:16px; white-space:nowrap;}
+    .mBot{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap:10px;
+      align-items:center;
+    }
+    .mMetric{
+      display:flex;
+      justify-content:space-between;
+      gap:10px;
+      padding:9px 10px;
+      border-radius:14px;
+      border:1px solid var(--stroke2);
+      background:rgba(0,0,0,.18);
+      font-size:13px;
+      white-space:nowrap;
+    }
+    .mMetric .k{color:var(--muted2); font-weight:750;}
+    .mMetric .v{font-weight:850;}
+
+    @media (max-width: 720px){
+      .tableWrap{max-height:none; overflow:visible;}
+      .deskTable{display:none;}
+      .mList{display:block;}
+    }
   </style>
 </head>
 
@@ -118,7 +174,7 @@
         <div class="logo"></div>
         <div class="title">
           <b>K-Stock Dashboard</b>
-          <span>v1.2.1 · 네이버 시세 기반 · 전종목 가나다순</span>
+          <span>v1.2.2 · 네이버 시세 기반 · 전종목 가나다순</span>
         </div>
       </div>
 
@@ -201,21 +257,29 @@
 
           <div class="miniLine" id="hintLine">전종목을 불러오는 중…</div>
 
-          <div style="margin-top:12px; max-height:68vh; overflow:auto; border-radius:16px; border:1px solid var(--stroke);">
-            <table>
-              <thead>
-                <tr>
-                  <th>종목</th>
-                  <th class="right">가격</th>
-                  <th class="right">등락</th>
-                  <th class="right">등락률</th>
-                  <th class="right">거래량</th>
-                </tr>
-              </thead>
-              <tbody id="allTbody">
-                <tr><td colspan="5" class="muted">데이터를 불러오는 중…</td></tr>
-              </tbody>
-            </table>
+          <div class="tableWrap">
+            <!-- 데스크탑: 테이블 -->
+            <div class="deskTable">
+              <table>
+                <thead>
+                  <tr>
+                    <th>종목</th>
+                    <th class="right">가격</th>
+                    <th class="right">등락</th>
+                    <th class="right">등락률</th>
+                    <th class="right">거래량</th>
+                  </tr>
+                </thead>
+                <tbody id="allTbody">
+                  <tr><td colspan="5" class="muted">데이터를 불러오는 중…</td></tr>
+                </tbody>
+              </table>
+            </div>
+
+            <!-- 모바일: 카드 리스트(좌우 스크롤 없음) -->
+            <div class="mList" id="mList">
+              <div class="muted" style="padding:10px;">데이터를 불러오는 중…</div>
+            </div>
           </div>
         </div>
       </section>
@@ -231,7 +295,6 @@
     const WORKER_BASE = "https://billowing-snowflake-fc22.purplusnow.workers.dev";
 
     // 2) 전종목 리스트는 정적 JSON 파일로
-    //    너가 GitHub Pages에 이 파일을 추가하면 됨: /data/kospi_kosdaq_list.json
     const LIST_URL = "./data/kospi_kosdaq_list.json";
 
     const INDEX_SYMBOLS = ["^KS11","^KQ11"];
@@ -287,11 +350,12 @@
         .replaceAll('"',"&quot;")
         .replaceAll("'","&#039;");
     }
-    function nameCellHtml(name, symbol){
+
+    // ✅ 테이블에서 종목코드/심볼 표시 제거 (종목명만)
+    function nameCellHtml(name){
       return `
         <div class="nameCell">
           <span class="nm">${escapeHtml(name || "-")}</span>
-          <span class="sy">${escapeHtml(symbol)}</span>
         </div>
       `;
     }
@@ -389,6 +453,24 @@
       $("countPill").textContent = "표시 " + VIEW_ROWS.length.toLocaleString("ko-KR") + "개";
       $("hintLine").textContent = q ? "검색/필터 적용됨" : "가나다순으로 정렬됨";
       renderAllTable();
+      renderMobileList();
+    }
+
+    function getRowMetrics(x){
+      const symbol = x.code + (x.market === "KOSDAQ" ? ".KQ" : ".KS");
+      const it = QUOTE_MAP.get(symbol);
+
+      const price = it?.regularMarketPrice ?? null;
+      const chg = it?.regularMarketChange ?? null;
+      const pct = it?.regularMarketChangePercent ?? null;
+      const vol = it?.regularMarketVolume ?? null;
+
+      const clsChg = classBySign(chg);
+      const clsPct = classBySign(pct);
+      const signChg = (typeof chg === "number" && chg > 0) ? "+" : "";
+      const signPct = (typeof pct === "number" && pct > 0) ? "+" : "";
+
+      return { price, chg, pct, vol, clsChg, clsPct, signChg, signPct };
     }
 
     function renderAllTable(){
@@ -402,30 +484,63 @@
       const rows = VIEW_ROWS.slice(0, LIMIT);
 
       tb.innerHTML = rows.map(x => {
-        const symbol = x.code + (x.market === "KOSDAQ" ? ".KQ" : ".KS");
-        const it = QUOTE_MAP.get(symbol);
-
-        const price = it?.regularMarketPrice ?? null;
-        const chg = it?.regularMarketChange ?? null;
-        const pct = it?.regularMarketChangePercent ?? null;
-        const vol = it?.regularMarketVolume ?? null;
-
-        const clsChg = classBySign(chg);
-        const clsPct = classBySign(pct);
-        const signChg = (typeof chg === "number" && chg > 0) ? "+" : "";
-        const signPct = (typeof pct === "number" && pct > 0) ? "+" : "";
+        const m = getRowMetrics(x);
 
         return `
           <tr>
-            <td>${nameCellHtml(x.name, symbol)}</td>
-            <td class="right">${fmtPrice(price)}</td>
-            <td class="right ${clsChg}">${signChg}${fmtPrice(chg)}</td>
-            <td class="right ${clsPct}">${signPct}${fmtPct(pct)}</td>
-            <td class="right">${fmtNum(vol)}</td>
+            <td>${nameCellHtml(x.name)}</td>
+            <td class="right">${fmtPrice(m.price)}</td>
+            <td class="right ${m.clsChg}">${m.signChg}${fmtPrice(m.chg)}</td>
+            <td class="right ${m.clsPct}">${m.signPct}${fmtPct(m.pct)}</td>
+            <td class="right">${fmtNum(m.vol)}</td>
           </tr>
         `;
       }).join("") + (VIEW_ROWS.length > LIMIT ? `
         <tr><td colspan="5" class="muted">너무 많아서 상단 ${LIMIT.toLocaleString("ko-KR")}개만 표시 중입니다. 검색으로 좁혀보세요.</td></tr>
+      ` : "");
+    }
+
+    // ✅ 모바일: 카드형 리스트 (좌우 스크롤 없이 핵심만)
+    function renderMobileList(){
+      const box = $("mList");
+      if (!box) return;
+
+      if (!VIEW_ROWS.length) {
+        box.innerHTML = `<div class="muted" style="padding:10px;">표시할 종목이 없습니다.</div>`;
+        return;
+      }
+
+      const LIMIT = 300; // 모바일은 과도한 DOM 줄이기
+      const rows = VIEW_ROWS.slice(0, LIMIT);
+
+      box.innerHTML = rows.map(x => {
+        const m = getRowMetrics(x);
+
+        return `
+          <div class="mRow">
+            <div class="mTop">
+              <div class="mName" title="${escapeHtml(x.name || "")}">${escapeHtml(x.name || "-")}</div>
+              <div class="mPrice">${fmtPrice(m.price)}</div>
+            </div>
+
+            <div class="mBot">
+              <div class="mMetric">
+                <span class="k">등락</span>
+                <span class="v ${m.clsChg}">${m.signChg}${fmtPrice(m.chg)}</span>
+              </div>
+              <div class="mMetric">
+                <span class="k">등락률</span>
+                <span class="v ${m.clsPct}">${m.signPct}${fmtPct(m.pct)}</span>
+              </div>
+              <div class="mMetric" style="grid-column: 1 / -1;">
+                <span class="k">거래량</span>
+                <span class="v">${fmtNum(m.vol)}</span>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join("") + (VIEW_ROWS.length > LIMIT ? `
+        <div class="muted" style="padding:10px;">모바일은 성능 때문에 상단 ${LIMIT.toLocaleString("ko-KR")}개만 표시 중입니다. 검색으로 좁혀보세요.</div>
       ` : "");
     }
 
@@ -440,10 +555,12 @@
       $("hintLine").textContent = "전종목을 불러오는 중…";
       $("countPill").textContent = "-";
       $("allTbody").innerHTML = `<tr><td colspan="5" class="muted">데이터를 불러오는 중…</td></tr>`;
+      const mList = $("mList");
+      if (mList) mList.innerHTML = `<div class="muted" style="padding:10px;">데이터를 불러오는 중…</div>`;
+
       QUOTE_MAP = new Map();
 
       try {
-        // ✅ 전종목 리스트는 정적 JSON에서만 읽음 (서브리퀘스트 폭탄 제거)
         ALL_LIST = await fetchStaticList();
         $("countPill").textContent = "총 " + ALL_LIST.length.toLocaleString("ko-KR") + "개";
 
@@ -468,6 +585,7 @@
         setStatus("error", "상태: 오류");
         $("hintLine").textContent = "불러오기에 실패했습니다.";
         $("allTbody").innerHTML = `<tr><td colspan="5" class="muted">데이터를 불러오지 못했습니다.</td></tr>`;
+        if ($("mList")) $("mList").innerHTML = `<div class="muted" style="padding:10px;">데이터를 불러오지 못했습니다.</div>`;
       }
     }
 
